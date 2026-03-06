@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LECTO-PISTES</title>
+  <style>
+    :root{
+      --bg:#07111f; --bg2:#0a1730; --panel:#101b2f; --panel2:#16233d; --line:#28405f;
+      --text:#eaf3ff; --muted:#aab8d4; --accent:#66e3ff; --accent2:#89a7ff; --good:#44d07f; --danger:#d35b7c;
+      --shadow:0 18px 40px rgba(0,0,0,.35); --radius:24px; --mono:"Courier New", Courier, monospace;
+    }
+    *{box-sizing:border-box} html,body{margin:0;height:100%}
+    body{font-family:var(--mono);color:var(--text);background:radial-gradient(circle at top right, rgba(102,227,255,.10), transparent 25%),radial-gradient(circle at bottom left, rgba(137,167,255,.08), transparent 25%),linear-gradient(180deg,var(--bg),#050b16 55%,#03070d);min-height:100vh}
+    .wrap{max-width:1320px;margin:0 auto;padding:28px}
+    .shell{border:1px solid var(--line);border-radius:30px;background:linear-gradient(180deg, rgba(16,27,47,.96), rgba(8,16,30,.96));box-shadow:var(--shadow);overflow:hidden}
+    header{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:22px 24px;border-bottom:1px solid var(--line);background:linear-gradient(90deg, rgba(20,37,62,.95), rgba(11,20,36,.92))}
+    .brand h1{margin:0;font-size:22px;letter-spacing:.04em}.brand p{margin:6px 0 0;color:var(--muted);font-size:14px}
+    .hud{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}.chip{border:1px solid var(--line);background:rgba(5,12,24,.72);border-radius:999px;padding:10px 14px;color:var(--muted);font-size:14px;white-space:nowrap}.chip b{color:var(--accent)}
+    main{display:grid;grid-template-columns:420px 1fr;gap:0;min-height:0;align-items:start}.left,.right{padding:20px;align-self:start}.left{border-right:1px solid var(--line)}
+    .panel{border:1px solid var(--line);border-radius:26px;background:linear-gradient(180deg, rgba(29,46,74,.7), rgba(12,22,39,.78));padding:18px;height:auto;align-content:start}
+    h2{margin:0 0 16px;font-size:18px}.card{border:1px solid rgba(40,64,95,.8);border-radius:22px;background:linear-gradient(180deg, rgba(18,30,50,.8), rgba(7,14,27,.85));padding:16px;box-shadow: inset 0 0 0 1px rgba(255,255,255,.02)}
+    .toast{border:1px solid rgba(40,64,95,.8);border-radius:18px;padding:14px;background:rgba(5,12,24,.45);color:#d7e4ff;line-height:1.55;font-size:15px}.toast b{color:var(--accent)}
+    .kv{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid rgba(40,64,95,.75);background:rgba(4,10,22,.5);padding:12px 14px;border-radius:18px;color:var(--muted)} .kv b{color:var(--accent);font-size:24px}
+    .stack{display:grid;gap:12px}.btnrow{display:flex;flex-wrap:wrap;gap:10px}
+    button,select,input{font:inherit;color:var(--text);background:#07101f;border:1px solid var(--line);border-radius:18px;padding:12px 14px;min-height:48px;outline:none}
+    select,input{width:100%} select{appearance:auto;-webkit-appearance:menulist;color:var(--text);background:#07101f;}
+    select option{background:#0b1220;color:var(--text)} button{cursor:pointer;transition:.18s transform ease,.18s background ease,.18s border-color ease} button:hover{transform:translateY(-1px);border-color:#4d6f9d}
+    button.primary{background:linear-gradient(180deg,#244d71,#1b324d);border-color:#46739d;font-weight:700} button.ghost{background:rgba(7,16,31,.7)} button.good{background:linear-gradient(180deg,#1e5c3d,#123724);border-color:#2f8a5c} button.danger{background:linear-gradient(180deg,#5d2640,#391628);border-color:#a24e6b}
+    button:disabled{opacity:.55;cursor:not-allowed;transform:none!important}
+    .label{font-size:14px;color:var(--muted);margin-bottom:6px}
+    .progress{height:16px;border-radius:999px;border:1px solid var(--line);background:#050c18;overflow:hidden}.progress > div{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .25s ease}
+    .bigstage{border:1px solid var(--line);border-radius:26px;height:auto;background:linear-gradient(180deg, rgba(28,44,68,.44), rgba(8,16,28,.62));padding:18px;display:flex;flex-direction:column;gap:14px}
+    .stagebox{border:1px solid rgba(40,64,95,.8);border-radius:20px;padding:18px;background:rgba(5,12,24,.42)}
+    .stage-title{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    .bigtext{font-size:34px;line-height:1.2;color:#fff;margin:8px 0 0;min-height:42px}.subtext{color:#c2d0ea;font-size:16px;line-height:1.6}
+    .choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}.choice{border:1px solid var(--line);background:rgba(5,12,24,.6);border-radius:20px;padding:18px;min-height:90px;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;letter-spacing:.04em}
+    .choice.correct{border-color:#2f8a5c;background:rgba(30,92,61,.3)} .choice.wrong{border-color:#a24e6b;background:rgba(93,38,64,.28)}
+    .footerbar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:14px}.hidden{display:none!important}.shadow-mode *{text-shadow:none!important;box-shadow:none!important}.muted{color:var(--muted)}
+    .midprogress{display:grid;gap:10px}
+    .progress-top{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
+    .progress-main{font-size:22px;color:#fff}
+    .progress-side{color:var(--accent);font-weight:700}
+    .progress-note{font-size:14px;color:var(--muted)}
+    .completion-box{border:1px solid rgba(47,138,92,.8);border-radius:22px;padding:18px;background:linear-gradient(180deg, rgba(30,92,61,.24), rgba(7,20,14,.6));display:grid;gap:12px}
+    .completion-title{font-size:28px;color:#fff;margin:0}
+    .completion-text{color:#d7e4ff;line-height:1.6;font-size:17px}
+    @media (max-width:1000px){main{grid-template-columns:1fr}.left{border-right:none;border-bottom:1px solid var(--line)}}
+  
+    #btnNext{display:none!important;}
+  
+    .brand{position:relative;isolation:isolate}
+    .brand::before{
+      content:"";
+      position:absolute;
+      left:-110px;
+      top:-90px;
+      width:520px;
+      height:260px;
+      pointer-events:none;
+      z-index:-1;
+      background:radial-gradient(ellipse at 32% 42%,
+        rgba(170,20,35,0.30) 0%,
+        rgba(145,18,30,0.24) 20%,
+        rgba(120,14,24,0.16) 42%,
+        rgba(95,10,20,0.08) 62%,
+        rgba(95,10,20,0.00) 78%);
+      filter:blur(14px);
+    }
+    h1{
+      letter-spacing:0.08em;
+      text-shadow:
+        0 0 2px rgba(255,255,255,0.18),
+        0 0 10px rgba(255,120,120,0.10);
+    }
+
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="shell" id="appShell">
+      <header>
+        <div class="brand">
+          <h1>LECTO-PISTES</h1>
+          <p>Joc bàsic de lectura per nivells: abecedari + fases del mètode</p>
+        </div>
+        <div class="hud">
+          <div class="chip">Alumne: <b id="chipName">—</b></div>
+          <div class="chip">Nivell: <b id="chipLevel">1</b></div>
+          <div class="chip">Ronda: <b id="chipMission">0</b></div>
+          <div class="chip">Punts: <b id="chipScore">0</b></div>
+        </div>
+      </header>
+
+      <main>
+        <section class="left">
+          <div class="panel stack">
+            <h2>CONTROL</h2>
+            <div class="card stack">
+              <div>
+                <div class="label">Nom de l’alumne</div>
+                <input id="playerInput" type="text" maxlength="16" placeholder="Escriu el nom" />
+              </div>
+
+              <div class="btnrow">
+                <button class="primary" id="btnStart">COMENÇA</button>
+                <button id="btnHow">Com es juga</button>
+              </div>
+
+
+              <div class="kv"><span>Nivell actual</span><b id="homeLevel">1</b></div>
+              <div class="toast" id="homeTip">Nivell 1: ABECEDARI.</div>
+
+              <div>
+                <div class="label">Selecciona nivell</div>
+                <select id="levelSelect" aria-label="Nivell">
+                  <option value="1">1 · ABECEDARI</option>
+                  <option value="2">2 · Fase 1: lectura de síl·labes directes</option>
+                  <option value="3">3 · Fase 2: lectura de síl·labes inverses</option>
+                  <option value="4">4 · Fase 3: lectura de paraules monosíl·labes</option>
+                  <option value="5">5 · Fase 4: lectura de bisíl·labs directes amb paraules comunes</option>
+                  <option value="6">6 · Fase 5: lectura de bisíl·labs inverses amb paraules comunes</option>
+                  <option value="7">7 · Fase 6: lectura de paraules amb síl·labes travades</option>
+                  <option value="8">8 · Fase 7: lectura de trisíl·labs amb paraules comunes</option>
+                  <option value="9">9 · Fase 8: lectura de paraules llargues (de més de tres síl·labes)</option>
+                  <option value="10">10 · Fase 9: lectura de pseudoparaules</option>
+                </select>
+              </div>
+
+              <div>
+                <div class="label">Velocitat de l'àudio</div>
+                <select id="speedSelect" aria-label="Velocitat de l'àudio">
+                  <option value="1">NORMAL (1x)</option>
+                  <option value="0.75">LENTA (0.75x)</option>
+                </select>
+              </div>
+
+              <div class="btnrow">
+                <button class="danger" id="btnReset">Reinicia progrés</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="right">
+          <div class="bigstage">
+            <div id="stageTitle" class="hidden"></div>
+            <div id="stageSub" class="hidden"></div>
+
+            <div class="stagebox midprogress">
+              <div class="stage-title">PROGRÉS DEL NIVELL</div>
+              <div class="progress-top">
+                <div class="progress-main" id="levelProgressTitle">ABECEDARI</div>
+                <div class="progress-side" id="levelProgressText">0 / 27 · 0%</div>
+              </div>
+              <div class="progress"><div id="levelBar"></div></div>
+              <div class="progress-note" id="levelProgressNote">Cal encertar almenys una vegada tots els elements del nivell.</div>
+              <div class="progress-note" id="accuracyText">Percentatge d’encerts del nivell: 0%</div>
+            </div>
+
+            <div class="stagebox">
+              <div class="stage-title">ACTIVITAT</div>
+              <div class="bigtext" id="bigPrompt">—</div>
+              <div class="subtext" id="promptHelp">Quan comencis, escoltaràs un àudio i n’hauràs de tocar l’opció correcta.</div>
+              <div class="btnrow" style="margin-top:12px">
+                <button class="good" id="btnReplay" disabled>REPRODUEIX ÀUDIO</button>
+                <button class="ghost" id="btnNext" disabled>NOVA RONDA</button>
+              </div>
+              <div class="choices hidden" id="choicesArea">
+                <button class="choice" id="choice0"></button>
+                <button class="choice" id="choice1"></button>
+                <button class="choice" id="choice2"></button>
+                <button class="choice" id="choice3"></button>
+              </div>
+
+              <div class="completion-box hidden" id="completionBox">
+                <div class="stage-title">NIVELL COMPLETAT</div>
+                <h3 class="completion-title" id="completionTitle">Molt bé!</h3>
+                <div class="completion-text" id="completionText">Has completat el nivell.</div>
+                <div class="btnrow">
+                  <button id="btnRepeatLevel">REPETIR</button>
+                  <button class="primary" id="btnContinueLevel">CONTINUAR</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="stagebox">
+              <div class="footerbar">
+                <div id="statusText">Estat: en espera</div>
+                <div>Desenvolupat per Javier L. Teso</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  
+  <script>
+    const LEVELS = [
+      "ABECEDARI",
+      "Fase 1: lectura de síl·labes directes",
+      "Fase 2: lectura de síl·labes inverses",
+      "Fase 3: lectura de paraules monosíl·labes",
+      "Fase 4: lectura de bisíl·labs directes amb paraules comunes",
+      "Fase 5: lectura de bisíl·labs inverses amb paraules comunes",
+      "Fase 6: lectura de paraules amb síl·labes travades",
+      "Fase 7: lectura de trisíl·labs amb paraules comunes",
+      "Fase 8: lectura de paraules llargues (de més de tres síl·labes)",
+      "Fase 9: lectura de pseudoparaules"
+    ];
+
+    const TIPS = [
+      "Nivell 1: ABECEDARI.",
+      "Nivell 2: síl·labes directes.",
+      "Nivell 3: síl·labes inverses.",
+      "Nivell 4: paraules monosíl·labes.",
+      "Nivell 5: bisíl·labs directes amb paraules comunes.",
+      "Nivell 6: bisíl·labs inverses amb paraules comunes.",
+      "Nivell 7: paraules amb síl·labes travades.",
+      "Nivell 8: trisíl·labs amb paraules comunes.",
+      "Nivell 9: paraules llargues de més de tres síl·labes.",
+      "Nivell 10: pseudoparaules."
+    ];
+
+    const STORAGE_KEY = "lecto_pistes_funcional_v10";
+
+    const mapItems = (symbols, folder) => symbols.map(symbol => ({ id: symbol, symbol, audio: `AUDIOS/${folder}/${symbol}.mp3` }));
+
+    const LEVEL_CONFIG = {
+      1: {
+        title: "ABECEDARI",
+        help: "Escolta l’àudio i toca la lletra correcta.",
+        actionTitle: "ESCOLTA I TRIA",
+        actionHelp: "Si t’equivoques, la casella quedarà en vermell i hauràs de trobar la bona per continuar. Les lletres fallades tornaran a sortir més endavant.",
+        items: [
+          "A","B","C","D","E","F","G","H","I","J","K","L","M","N","NY","O","P","Q","R","S","T","U","V","W","X","Y","Z"
+        ].map(symbol => ({ id: symbol, symbol, audio: `AUDIOS/ABECEDARI/${symbol}.mp3` }))
+      },
+      2: {
+        title: "FASE 1",
+        help: "Escolta l’àudio i toca la síl·laba directa correcta.",
+        actionTitle: "ESCOLTA I TRIA",
+        actionHelp: "",
+        items: [
+          "BE","BI","BO","CA","CE","CI","CO","DA","DE","DI","DU","FA","FE","FI","FU","GA","GO","GU","HA","HE","HO","JA","JE","JI","JO","KI","KO","LE","LO","MA","MI","MO","MU","NA","NI","NO","PA","PI","PO","PU","RE","RI","RU","SE","SI","SO","SU","TA","TE","TI","TU","VI","VO","VU","XE","XO","XU"
+        ].map(symbol => ({ id: symbol, symbol, audio: `AUDIOS/DIRECTES/${symbol}.mp3` }))
+      },
+      3: {
+        title: "FASE 2",
+        help: "Escolta l’àudio i toca la síl·laba inversa correcta.",
+        actionTitle: "ESCOLTA I TRIA",
+        actionHelp: "",
+        items: [
+          { id:"AP", symbol:"AP", audio:"AUDIOS/INVERSES/AP.mp3" },
+          { id:"ET", symbol:"ET", audio:"AUDIOS/INVERSES/ET.mp3" },
+          { id:"OP", symbol:"OP", audio:"AUDIOS/INVERSES/OP.mp3" },
+          { id:"OL", symbol:"OL", audio:"AUDIOS/INVERSES/OL.mp3" },
+          { id:"EF", symbol:"EF", audio:"AUDIOS/INVERSES/EF.mp3" },
+          { id:"IF", symbol:"IF", audio:"AUDIOS/INVERSES/IF.mp3" },
+          { id:"AC", symbol:"AC", audio:"AUDIOS/INVERSES/AC.mp3" },
+          { id:"OB", symbol:"OB", audio:"AUDIOS/INVERSES/OB.mp3" },
+          { id:"ER", symbol:"ER", audio:"AUDIOS/INVERSES/ER.mp3" },
+          { id:"UT", symbol:"UT", audio:"AUDIOS/INVERSES/UT.mp3" },
+          { id:"EV", symbol:"EV", audio:"AUDIOS/INVERSES/EV.mp3" },
+          { id:"OF", symbol:"OF", audio:"AUDIOS/INVERSES/OF.mp3" },
+          { id:"AS", symbol:"AS", audio:"AUDIOS/INVERSES/AS.mp3" },
+          { id:"ID", symbol:"ID", audio:"AUDIOS/INVERSES/ID.mp3" },
+          { id:"IS", symbol:"IS", audio:"AUDIOS/INVERSES/IS.mp3" },
+          { id:"EP", symbol:"EP", audio:"AUDIOS/INVERSES/EP.mp3" },
+          { id:"OZ", symbol:"OZ", audio:"AUDIOS/INVERSES/OZ.mp3" },
+          { id:"IX", symbol:"IX", audio:"AUDIOS/INVERSES/IX.mp3" },
+          { id:"IR", symbol:"IR", audio:"AUDIOS/INVERSES/IR.mp3" },
+          { id:"EM", symbol:"EM", audio:"AUDIOS/INVERSES/EM.mp3" },
+          { id:"IN", symbol:"IN", audio:"AUDIOS/INVERSES/IN.mp3" },
+          { id:"AM", symbol:"AM", audio:"AUDIOS/INVERSES/AM.mp3" },
+          { id:"ED", symbol:"ED", audio:"AUDIOS/INVERSES/ED.mp3" },
+          { id:"ES", symbol:"ES", audio:"AUDIOS/INVERSES/ES.mp3" },
+          { id:"OS", symbol:"OS", audio:"AUDIOS/INVERSES/OS.mp3" },
+          { id:"UF", symbol:"UF", audio:"AUDIOS/INVERSES/UF.mp3" },
+          { id:"IM", symbol:"IM", audio:"AUDIOS/INVERSES/IM.mp3" },
+          { id:"ON", symbol:"ON", audio:"AUDIOS/INVERSES/ON.mp3" },
+          { id:"US", symbol:"US", audio:"AUDIOS/INVERSES/US.mp3" },
+          { id:"IC1", symbol:"IC", audio:"AUDIOS/INVERSES/IC.mp3" },
+          { id:"EC", symbol:"EC", audio:"AUDIOS/INVERSES/EC.mp3" },
+          { id:"UN", symbol:"UN", audio:"AUDIOS/INVERSES/UN.mp3" },
+          { id:"AN", symbol:"AN", audio:"AUDIOS/INVERSES/AN.mp3" },
+          { id:"IK", symbol:"IK", audio:"AUDIOS/INVERSES/IK.mp3" },
+          { id:"AK", symbol:"AK", audio:"AUDIOS/INVERSES/AK.mp3" },
+          { id:"EX", symbol:"EX", audio:"AUDIOS/INVERSES/EX.mp3" },
+          { id:"OH", symbol:"OH", audio:"AUDIOS/INVERSES/OH.mp3" },
+          { id:"EH", symbol:"EH", audio:"AUDIOS/INVERSES/EH.mp3" },
+          { id:"IH", symbol:"IH", audio:"AUDIOS/INVERSES/IH.mp3" },
+          { id:"AH", symbol:"AH", audio:"AUDIOS/INVERSES/AH.mp3" },
+          { id:"UG", symbol:"UG", audio:"AUDIOS/INVERSES/UG.mp3" },
+          { id:"EL", symbol:"EL", audio:"AUDIOS/INVERSES/EL.mp3" },
+          { id:"IG", symbol:"IG", audio:"AUDIOS/INVERSES/IG.mp3" },
+          { id:"AG", symbol:"AG", audio:"AUDIOS/INVERSES/AG.mp3" },
+          { id:"OC", symbol:"OC", audio:"AUDIOS/INVERSES/OC.mp3" },
+          { id:"UC", symbol:"UC", audio:"AUDIOS/INVERSES/UC.mp3" },
+          { id:"IC2", symbol:"IC", audio:"AUDIOS/INVERSES/IC-2.mp3" },
+          { id:"IP", symbol:"IP", audio:"AUDIOS/INVERSES/IP.mp3" },
+          { id:"OX", symbol:"OX", audio:"AUDIOS/INVERSES/OX.mp3" },
+          { id:"UH", symbol:"UH", audio:"AUDIOS/INVERSES/UH.mp3" },
+          { id:"OM", symbol:"OM", audio:"AUDIOS/INVERSES/OM.mp3" },
+          { id:"OJ", symbol:"OJ", audio:"AUDIOS/INVERSES/OJ.mp3" },
+          { id:"AJ", symbol:"AJ", audio:"AUDIOS/INVERSES/AJ.mp3" },
+          { id:"EJ", symbol:"EJ", audio:"AUDIOS/INVERSES/EJ.mp3" },
+          { id:"IJ", symbol:"IJ", audio:"AUDIOS/INVERSES/IJ.mp3" },
+          { id:"UJ", symbol:"UJ", audio:"AUDIOS/INVERSES/UJ.mp3" },
+          { id:"UY", symbol:"UY", audio:"AUDIOS/INVERSES/UY.mp3" },
+          { id:"OY", symbol:"OY", audio:"AUDIOS/INVERSES/OY.mp3" },
+          { id:"IY", symbol:"IY", audio:"AUDIOS/INVERSES/IY.mp3" },
+          { id:"AY", symbol:"AY", audio:"AUDIOS/INVERSES/AY.mp3" }
+        ]
+      },
+      4: {
+        title: "FASE 3",
+        help: "Escolta l’àudio i toca la paraula monosíl·laba correcta.",
+        actionTitle: "ESCOLTA I TRIA",
+        actionHelp: "",
+        items: [
+          { id:"MÀ", symbol:"MÀ", audio:"AUDIOS/MONO/MA.mp3" },
+          { id:"MÓN", symbol:"MÓN", audio:"AUDIOS/MONO/MON.mp3" },
+          { id:"PI", symbol:"PI", audio:"AUDIOS/MONO/PI.mp3" },
+          { id:"QUE", symbol:"QUE", audio:"AUDIOS/MONO/QUE.mp3" },
+          { id:"JOC", symbol:"JOC", audio:"AUDIOS/MONO/JOC.mp3" },
+          { id:"FI", symbol:"FI", audio:"AUDIOS/MONO/FI.mp3" },
+          { id:"TEU", symbol:"TEU", audio:"AUDIOS/MONO/TEU.mp3" },
+          { id:"BO", symbol:"BO", audio:"AUDIOS/MONO/BO.mp3" },
+          { id:"SA", symbol:"SA", audio:"AUDIOS/MONO/SA.mp3" },
+          { id:"MEU", symbol:"MEU", audio:"AUDIOS/MONO/MEU.mp3" },
+          { id:"DE", symbol:"DE", audio:"AUDIOS/MONO/DE.mp3" },
+          { id:"RE", symbol:"RE", audio:"AUDIOS/MONO/RE.mp3" },
+          { id:"FA", symbol:"FA", audio:"AUDIOS/MONO/FA.mp3" },
+          { id:"SOL", symbol:"SOL", audio:"AUDIOS/MONO/SOL.mp3" },
+          { id:"SEU", symbol:"SEU", audio:"AUDIOS/MONO/SEU.mp3" },
+          { id:"PEU", symbol:"PEU", audio:"AUDIOS/MONO/PEU.mp3" },
+          { id:"FIU", symbol:"FIU", audio:"AUDIOS/MONO/FIU.mp3" },
+          { id:"SAC", symbol:"SAC", audio:"AUDIOS/MONO/SAC.mp3" },
+          { id:"SEC", symbol:"SEC", audio:"AUDIOS/MONO/SEC.mp3" },
+          { id:"SOT", symbol:"SOT", audio:"AUDIOS/MONO/SOT.mp3" },
+          { id:"NO", symbol:"NO", audio:"AUDIOS/MONO/NO.mp3" },
+          { id:"TIR", symbol:"TIR", audio:"AUDIOS/MONO/TIR.mp3" },
+          { id:"RES", symbol:"RES", audio:"AUDIOS/MONO/RES.mp3" },
+          { id:"NOM", symbol:"NOM", audio:"AUDIOS/MONO/NOM.mp3" },
+          { id:"CAP", symbol:"CAP", audio:"AUDIOS/MONO/CAP.mp3" },
+          { id:"XIU", symbol:"XIU", audio:"AUDIOS/MONO/XIU.mp3" },
+          { id:"DOS", symbol:"DOS", audio:"AUDIOS/MONO/DOS.mp3" },
+          { id:"DIT", symbol:"DIT", audio:"AUDIOS/MONO/DIT.mp3" },
+          { id:"FEU", symbol:"FEU", audio:"AUDIOS/MONO/FEU.mp3" },
+          { id:"CUC", symbol:"CUC", audio:"AUDIOS/MONO/CUC.mp3" },
+          { id:"COC", symbol:"COC", audio:"AUDIOS/MONO/COC.mp3" },
+          { id:"MIAU", symbol:"MIAU", audio:"AUDIOS/MONO/MIAU.mp3" },
+          { id:"FOC", symbol:"FOC", audio:"AUDIOS/MONO/FOC.mp3" },
+          { id:"TOC", symbol:"TOC", audio:"AUDIOS/MONO/TOC.mp3" },
+          { id:"REC", symbol:"REC", audio:"AUDIOS/MONO/REC.mp3" },
+          { id:"ROT", symbol:"ROT", audio:"AUDIOS/MONO/ROT.mp3" },
+          { id:"UN", symbol:"UN", audio:"AUDIOS/MONO/UN.mp3" },
+          { id:"GAT", symbol:"GAT", audio:"AUDIOS/MONO/GAT.mp3" },
+          { id:"GOS", symbol:"GOS", audio:"AUDIOS/MONO/GOS.mp3" },
+          { id:"SIS", symbol:"SIS", audio:"AUDIOS/MONO/SIS.mp3" },
+          { id:"BUIT", symbol:"BUIT", audio:"AUDIOS/MONO/BUIT.mp3" },
+          { id:"SET", symbol:"SET", audio:"AUDIOS/MONO/SET.mp3" },
+          { id:"VAS", symbol:"VAS", audio:"AUDIOS/MONO/VAS.mp3" },
+          { id:"BOU", symbol:"BOU", audio:"AUDIOS/MONO/BOU.mp3" },
+          { id:"OU", symbol:"OU", audio:"AUDIOS/MONO/OU.mp3" },
+          { id:"CEC", symbol:"CEC", audio:"AUDIOS/MONO/CEC.mp3" },
+          { id:"COU", symbol:"COU", audio:"AUDIOS/MONO/COU.mp3" },
+          { id:"VUIT", symbol:"VUIT", audio:"AUDIOS/MONO/VUIT.mp3" },
+          { id:"FEM", symbol:"FEM", audio:"AUDIOS/MONO/FEM.mp3" },
+          { id:"PIT", symbol:"PIT", audio:"AUDIOS/MONO/PIT.mp3" },
+          { id:"XIC", symbol:"XIC", audio:"AUDIOS/MONO/XIC.mp3" },
+          { id:"CUL", symbol:"CUL", audio:"AUDIOS/MONO/CUL.mp3" },
+          { id:"PET", symbol:"PET", audio:"AUDIOS/MONO/PET.mp3" },
+          { id:"NEN", symbol:"NEN", audio:"AUDIOS/MONO/NEN.mp3" },
+          { id:"VI", symbol:"VI", audio:"AUDIOS/MONO/VI.mp3" },
+          { id:"LOT", symbol:"LOT", audio:"AUDIOS/MONO/LOT.mp3" },
+          { id:"QUI", symbol:"QUI", audio:"AUDIOS/MONO/QUI.mp3" },
+          { id:"XOC", symbol:"XOC", audio:"AUDIOS/MONO/XOC.mp3" },
+          { id:"NUS", symbol:"NUS", audio:"AUDIOS/MONO/NUS.mp3" },
+          { id:"POT", symbol:"POT", audio:"AUDIOS/MONO/POT.mp3" }
+        ]
+      },
+      5: {
+        title: "FASE 4",
+        help: "Escolta l’àudio i toca la paraula bisíl·laba directa correcta.",
+        actionTitle: "ESCOLTA I TRIA",
+        actionHelp: "",
+        items: [
+          "CASA","PAPA","COSA","ROCA","PIPA","SOCA","TELA","BONA","DITA","XOCA","FOCA","META","MONO","MAPA","NINA","RODA","GOMA","HOME","LUPA","LILA","DINO","FULLA","FUMA","PERA","BOLA","CINE","MOCA","BOCA","CERA","NENA","MOLA","SURA","FICA","LLOCA","TIRA","SOPA","GOTA","NOTA","MICA","FIRA","SECA","ZERO","CUCA","BOTA","VIDA","BODA","NUCA","RIMA","ROMA","GATA","POTA","JOTA","JUGA","GORRA","TACA","DATA","COPA","CAPA","MONA","MEVA"
+        ].map(symbol => ({ id: symbol, symbol, audio: `AUDIOS/BI-DIRECTE/${symbol}.mp3` }))
+      },
+      6: {
+        title: "FASE 5",
+        help: "Escolta l’àudio i toca la paraula bisíl·laba inversa correcta.",
+        actionTitle: "ESCOLTA I TRIA",
+        actionHelp: "",
+        items: [
+          { id:"ERIÇÓ", symbol:"ERIÇÓ", audio:"AUDIOS/BI-INVERSES/ERIÇO.mp3" },
+          { id:"ARBRE", symbol:"ARBRE", audio:"AUDIOS/BI-INVERSES/ARBRE.mp3" },
+          { id:"CIRC", symbol:"CIRC", audio:"AUDIOS/BI-INVERSES/CIRC.mp3" },
+          { id:"ANTIC", symbol:"ANTIC", audio:"AUDIOS/BI-INVERSES/ANTIC.mp3" },
+          { id:"AMIC", symbol:"AMIC", audio:"AUDIOS/BI-INVERSES/AMIC.mp3" },
+          { id:"UNGLA", symbol:"UNGLA", audio:"AUDIOS/BI-INVERSES/UNGLA.mp3" },
+          { id:"ARC_1", symbol:"ARC", audio:"AUDIOS/BI-INVERSES/ARC.mp3" },
+          { id:"MULTA", symbol:"MULTA", audio:"AUDIOS/BI-INVERSES/MULTA.mp3" },
+          { id:"INDI_1", symbol:"INDI", audio:"AUDIOS/BI-INVERSES/INDI.mp3" },
+          { id:"ESPIA", symbol:"ESPIA", audio:"AUDIOS/BI-INVERSES/ESPIA.mp3" },
+          { id:"ESCLAT", symbol:"ESCLAT", audio:"AUDIOS/BI-INVERSES/ESCLAT.mp3" },
+          { id:"AMO", symbol:"AMO", audio:"AUDIOS/BI-INVERSES/AMO.mp3" },
+          { id:"ARPA", symbol:"ARPA", audio:"AUDIOS/BI-INVERSES/ARPA.mp3" },
+          { id:"ALTA", symbol:"ALTA", audio:"AUDIOS/BI-INVERSES/ALTA.mp3" },
+          { id:"ESTEL", symbol:"ESTEL", audio:"AUDIOS/BI-INVERSES/ESTEL.mp3" },
+          { id:"ARMA", symbol:"ARMA", audio:"AUDIOS/BI-INVERSES/ARMA.mp3" },
+          { id:"ASTRE", symbol:"ASTRE", audio:"AUDIOS/BI-INVERSES/ASTRE.mp3" },
+          { id:"AGULLA", symbol:"AGULLA", audio:"AUDIOS/BI-INVERSES/AGULLA.mp3" },
+          { id:"OMBRA", symbol:"OMBRA", audio:"AUDIOS/BI-INVERSES/OMBRA.mp3" },
+          { id:"ESTIL", symbol:"ESTIL", audio:"AUDIOS/BI-INVERSES/ESTIL.mp3" },
+          { id:"ÀNEC", symbol:"ÀNEC", audio:"AUDIOS/BI-INVERSES/ANEC.mp3" },
+          { id:"ALBERT", symbol:"ALBERT", audio:"AUDIOS/BI-INVERSES/ALBERT.mp3" },
+          { id:"ANELL", symbol:"ANELL", audio:"AUDIOS/BI-INVERSES/ANELL.mp3" },
+          { id:"ESTAT", symbol:"ESTAT", audio:"AUDIOS/BI-INVERSES/ESTAT.mp3" },
+          { id:"AMOR", symbol:"AMOR", audio:"AUDIOS/BI-INVERSES/AMOR.mp3" },
+          { id:"ANCLA", symbol:"ANCLA", audio:"AUDIOS/BI-INVERSES/ANCLA.mp3" },
+          { id:"ONCLE", symbol:"ONCLE", audio:"AUDIOS/BI-INVERSES/ONCLE.mp3" },
+          { id:"ASMA", symbol:"ASMA", audio:"AUDIOS/BI-INVERSES/ASMA.mp3" },
+          { id:"AVI", symbol:"AVI", audio:"AUDIOS/BI-INVERSES/AVI.mp3" },
+          { id:"ONZE", symbol:"ONZE", audio:"AUDIOS/BI-INVERSES/ONZE.mp3" },
+          { id:"ELENA", symbol:"ELENA", audio:"AUDIOS/BI-INVERSES/ELENA.mp3" },
+          { id:"POLSE", symbol:"POLSE", audio:"AUDIOS/BI-INVERSES/POLSE.mp3" },
+          { id:"BARCA", symbol:"BARCA", audio:"AUDIOS/BI-INVERSES/BARCA.mp3" },
+          { id:"INMA", symbol:"INMA", audio:"AUDIOS/BI-INVERSES/INMA.mp3" },
+          { id:"EMMA_1", symbol:"EMMA", audio:"AUDIOS/BI-INVERSES/EMMA.mp3" },
+          { id:"ERIC", symbol:"ERIC", audio:"AUDIOS/BI-INVERSES/ERIC.mp3" },
+          { id:"ONA", symbol:"ONA", audio:"AUDIOS/BI-INVERSES/ONA.mp3" },
+          { id:"ÀNIM", symbol:"ÀNIM", audio:"AUDIOS/BI-INVERSES/ANIM.mp3" },
+          { id:"ADOB", symbol:"ADOB", audio:"AUDIOS/BI-INVERSES/ADOB.mp3" },
+          { id:"INDI_2", symbol:"INDI", audio:"AUDIOS/BI-INVERSES/INDI-2.mp3" },
+          { id:"OR", symbol:"OR", audio:"AUDIOS/BI-INVERSES/OR.mp3" },
+          { id:"ARC_2", symbol:"ARC", audio:"AUDIOS/BI-INVERSES/ARC-2.mp3" },
+          { id:"IGLÚ", symbol:"IGLÚ", audio:"AUDIOS/BI-INVERSES/IGLU.mp3" },
+          { id:"URPA", symbol:"URPA", audio:"AUDIOS/BI-INVERSES/URPA.mp3" },
+          { id:"ESTRI", symbol:"ESTRI", audio:"AUDIOS/BI-INVERSES/ESTRI.mp3" },
+          { id:"ANNA", symbol:"ANNA", audio:"AUDIOS/BI-INVERSES/ANNA.mp3" },
+          { id:"EMMA_2", symbol:"EMMA", audio:"AUDIOS/BI-INVERSES/EMMA-2.mp3" },
+          { id:"ACTE", symbol:"ACTE", audio:"AUDIOS/BI-INVERSES/ACTE.mp3" },
+          { id:"ACTOR", symbol:"ACTOR", audio:"AUDIOS/BI-INVERSES/ACTOR.mp3" },
+          { id:"AJUT", symbol:"AJUT", audio:"AUDIOS/BI-INVERSES/AJUT.mp3" },
+          { id:"ACTRIU", symbol:"ACTRIU", audio:"AUDIOS/BI-INVERSES/ACTRIU.mp3" },
+          { id:"AVALL", symbol:"AVALL", audio:"AUDIOS/BI-INVERSES/AVALL.mp3" },
+          { id:"AMUNT", symbol:"AMUNT", audio:"AUDIOS/BI-INVERSES/AMUNT.mp3" },
+          { id:"FUSTA", symbol:"FUSTA", audio:"AUDIOS/BI-INVERSES/FUSTA.mp3" },
+          { id:"GERMÀ", symbol:"GERMÀ", audio:"AUDIOS/BI-INVERSES/GERMÀ.mp3" },
+          { id:"ESTOIG", symbol:"ESTOIG", audio:"AUDIOS/BI-INVERSES/ESTOIG.mp3" },
+          { id:"ORDRE", symbol:"ORDRE", audio:"AUDIOS/BI-INVERSES/ORDRE.mp3" },
+          { id:"UNIT", symbol:"UNIT", audio:"AUDIOS/BI-INVERSES/UNIT.mp3" },
+          { id:"IMAN", symbol:"IMAN", audio:"AUDIOS/BI-INVERSES/IMAN.mp3" },
+          { id:"OLI", symbol:"OLI", audio:"AUDIOS/BI-INVERSES/OLI.mp3" }
+        ]
+      },
+      7: {
+        title: "FASE 6",
+        help: "Escolta l’àudio i toca la paraula amb síl·laba trabada correcta.",
+        actionTitle: "ESCOLTA I TRIA",
+        actionHelp: "",
+        items: [
+          { id:"TRACTOR", symbol:"TRACTOR", audio:"AUDIOS/TRAVADES/TRACTOR.mp3" },
+          { id:"BRANCA", symbol:"BRANCA", audio:"AUDIOS/TRAVADES/BRANCA.mp3" },
+          { id:"FLAUTA", symbol:"FLAUTA", audio:"AUDIOS/TRAVADES/FLAUTA.mp3" },
+          { id:"BRISA", symbol:"BRISA", audio:"AUDIOS/TRAVADES/BRISA.mp3" },
+          { id:"BRUIXA", symbol:"BRUIXA", audio:"AUDIOS/TRAVADES/BRUIXA.mp3" },
+          { id:"PLÀTAN", symbol:"PLÀTAN", audio:"AUDIOS/TRAVADES/PLATAN.mp3" },
+          { id:"BROMA", symbol:"BROMA", audio:"AUDIOS/TRAVADES/BROMA.mp3" },
+          { id:"TRINEU", symbol:"TRINEU", audio:"AUDIOS/TRAVADES/TRINEU.mp3" },
+          { id:"TIMBRE", symbol:"TIMBRE", audio:"AUDIOS/TRAVADES/TIMBRE.mp3" },
+          { id:"PREMI", symbol:"PREMI", audio:"AUDIOS/TRAVADES/PREMI.mp3" },
+          { id:"FLOTA", symbol:"FLOTA", audio:"AUDIOS/TRAVADES/FLOTA.mp3" },
+          { id:"FLOR", symbol:"FLOR", audio:"AUDIOS/TRAVADES/FLOR.mp3" },
+          { id:"PRÉSTEC", symbol:"PRÉSTEC", audio:"AUDIOS/TRAVADES/PRESTEC.mp3" },
+          { id:"ARBRE_T", symbol:"ARBRE", audio:"AUDIOS/TRAVADES/ARBRE.mp3" },
+          { id:"FRUITA", symbol:"FRUITA", audio:"AUDIOS/TRAVADES/FRUITA.mp3" },
+          { id:"BLANC", symbol:"BLANC", audio:"AUDIOS/TRAVADES/BLANC.mp3" },
+          { id:"TROS", symbol:"TROS", audio:"AUDIOS/TRAVADES/TROS.mp3" },
+          { id:"PEBROT", symbol:"PEBROT", audio:"AUDIOS/TRAVADES/PEBROT.mp3" },
+          { id:"BLAU", symbol:"BLAU", audio:"AUDIOS/TRAVADES/BLAU.mp3" },
+          { id:"PRIMER", symbol:"PRIMER", audio:"AUDIOS/TRAVADES/PRIMER.mp3" },
+          { id:"BRUSA", symbol:"BRUSA", audio:"AUDIOS/TRAVADES/BRUSA.mp3" },
+          { id:"BRUC", symbol:"BRUC", audio:"AUDIOS/TRAVADES/BRUC.mp3" },
+          { id:"TRO", symbol:"TRO", audio:"AUDIOS/TRAVADES/TRO.mp3" },
+          { id:"TRAMPA", symbol:"TRAMPA", audio:"AUDIOS/TRAVADES/TRAMPA.mp3" },
+          { id:"INTRÚS", symbol:"INTRÚS", audio:"AUDIOS/TRAVADES/INTRUS.mp3" },
+          { id:"TROMPA", symbol:"TROMPA", audio:"AUDIOS/TRAVADES/TROMPA.mp3" },
+          { id:"FLAMA", symbol:"FLAMA", audio:"AUDIOS/TRAVADES/FLAMA.mp3" },
+          { id:"PLOMA", symbol:"PLOMA", audio:"AUDIOS/TRAVADES/PLOMA.mp3" },
+          { id:"COMPRA", symbol:"COMPRA", audio:"AUDIOS/TRAVADES/COMPRA.mp3" },
+          { id:"PLUJA", symbol:"PLUJA", audio:"AUDIOS/TRAVADES/PLUJA.mp3" },
+          { id:"TRUJA", symbol:"TRUJA", audio:"AUDIOS/TRAVADES/TRUJA.mp3" },
+          { id:"FRONT", symbol:"FRONT", audio:"AUDIOS/TRAVADES/FRONT.mp3" },
+          { id:"FRED", symbol:"FRED", audio:"AUDIOS/TRAVADES/FRED.mp3" },
+          { id:"GRUA", symbol:"GRUA", audio:"AUDIOS/TRAVADES/GRUA.mp3" },
+          { id:"GROS", symbol:"GROS", audio:"AUDIOS/TRAVADES/GROS.mp3" },
+          { id:"TIGRE", symbol:"TIGRE", audio:"AUDIOS/TRAVADES/TIGRE.mp3" },
+          { id:"LLADRE", symbol:"LLADRE", audio:"AUDIOS/TRAVADES/LLADRE.mp3" },
+          { id:"GROC", symbol:"GROC", audio:"AUDIOS/TRAVADES/GROC.mp3" },
+          { id:"BLOC", symbol:"BLOC", audio:"AUDIOS/TRAVADES/BLOC.mp3" },
+          { id:"AMPLE", symbol:"AMPLE", audio:"AUDIOS/TRAVADES/AMPLE.mp3" },
+          { id:"FLETXA", symbol:"FLETXA", audio:"AUDIOS/TRAVADES/FLETXA.mp3" },
+          { id:"FLOTAR", symbol:"FLOTAR", audio:"AUDIOS/TRAVADES/FLOTAR.mp3" },
+          { id:"XANCLES", symbol:"XANCLES", audio:"AUDIOS/TRAVADES/XANCLES.mp3" },
+          { id:"CICLE", symbol:"CICLE", audio:"AUDIOS/TRAVADES/CICLE.mp3" },
+          { id:"CLOSCA", symbol:"CLOSCA", audio:"AUDIOS/TRAVADES/CLOSCA.mp3" },
+          { id:"CABRA", symbol:"CABRA", audio:"AUDIOS/TRAVADES/CABRA.mp3" },
+          { id:"CLIP", symbol:"CLIP", audio:"AUDIOS/TRAVADES/CLIP.mp3" },
+          { id:"LLIBRE", symbol:"LLIBRE", audio:"AUDIOS/TRAVADES/LLIBRE.mp3" },
+          { id:"GLOBUS", symbol:"GLOBUS", audio:"AUDIOS/TRAVADES/GLOBUS.mp3" },
+          { id:"GLOP", symbol:"GLOP", audio:"AUDIOS/TRAVADES/GLOP.mp3" },
+          { id:"REGLE", symbol:"REGLE", audio:"AUDIOS/TRAVADES/REGLE.mp3" },
+          { id:"POBLE", symbol:"POBLE", audio:"AUDIOS/TRAVADES/POBLE.mp3" },
+          { id:"BÍBLIA", symbol:"BÍBLIA", audio:"AUDIOS/TRAVADES/BIBLIA.mp3" },
+          { id:"BLAT", symbol:"BLAT", audio:"AUDIOS/TRAVADES/BLAT.mp3" },
+          { id:"PRUNA_1", symbol:"PRUNA", audio:"AUDIOS/TRAVADES/PRUNA.mp3" },
+          { id:"PRIM", symbol:"PRIM", audio:"AUDIOS/TRAVADES/PRIM.mp3" },
+          { id:"PRUNA_2", symbol:"PRUNA", audio:"AUDIOS/TRAVADES/PRUNA-2.mp3" },
+          { id:"GRAN", symbol:"GRAN", audio:"AUDIOS/TRAVADES/GRAN.mp3" },
+          { id:"FLAM", symbol:"FLAM", audio:"AUDIOS/TRAVADES/FLAM.mp3" },
+          { id:"FRENA", symbol:"FRENA", audio:"AUDIOS/TRAVADES/FRENA.mp3" }
+        ]
+      },
+      8: {
+        title: "FASE 7",
+        help: "Escolta l’àudio i toca la paraula trisíl·laba correcta.",
+        actionTitle: "ESCOLTA I TRIA",
+        actionHelp: "",
+        items: [
+          { id:"CARPETA", symbol:"CARPETA", audio:"AUDIOS/TRISILABS/CARPETA.mp3" },
+          { id:"ESTUFA", symbol:"ESTUFA", audio:"AUDIOS/TRISILABS/ESTUFA.mp3" },
+          { id:"ARMARI", symbol:"ARMARI", audio:"AUDIOS/TRISILABS/ARMARI.mp3" },
+          { id:"SETMANA", symbol:"SETMANA", audio:"AUDIOS/TRISILABS/SETMANA.mp3" },
+          { id:"HOSPITAL", symbol:"HOSPITAL", audio:"AUDIOS/TRISILABS/HOSPITAL.mp3" },
+          { id:"VOSALTRES", symbol:"VOSALTRES", audio:"AUDIOS/TRISILABS/VOSALTRES.mp3" },
+          { id:"ARANYA", symbol:"ARANYA", audio:"AUDIOS/TRISILABS/ARANYA.mp3" },
+          { id:"JOGUINA", symbol:"JOGUINA", audio:"AUDIOS/TRISILABS/JOGUINA.mp3" },
+          { id:"MOTXILLA", symbol:"MOTXILLA", audio:"AUDIOS/TRISILABS/MOTXILLA.mp3" },
+          { id:"CASETA", symbol:"CASETA", audio:"AUDIOS/TRISILABS/CASETA.mp3" },
+          { id:"DOMINO", symbol:"DOMINO", audio:"AUDIOS/TRISILABS/DOMINO.mp3" },
+          { id:"RATOLÍ", symbol:"RATOLÍ", audio:"AUDIOS/TRISILABS/RATOLI.mp3" },
+          { id:"AMPOLLA", symbol:"AMPOLLA", audio:"AUDIOS/TRISILABS/AMPOLLA.mp3" },
+          { id:"PANTALLA", symbol:"PANTALLA", audio:"AUDIOS/TRISILABS/PANTALLA.mp3" },
+          { id:"BUFANDA", symbol:"BUFANDA", audio:"AUDIOS/TRISILABS/BUFANDA.mp3" },
+          { id:"JAQUETA", symbol:"JAQUETA", audio:"AUDIOS/TRISILABS/JAQUETA.mp3" },
+          { id:"FALDILLA", symbol:"FALDILLA", audio:"AUDIOS/TRISILABS/FALDILLA.mp3" },
+          { id:"MENJADOR", symbol:"MENJADOR", audio:"AUDIOS/TRISILABS/MENJADOR.mp3" },
+          { id:"MÀQUINA", symbol:"MÀQUINA", audio:"AUDIOS/TRISILABS/MAQUINA.mp3" },
+          { id:"CULLERA", symbol:"CULLERA", audio:"AUDIOS/TRISILABS/CULLERA.mp3" },
+          { id:"AGENDA", symbol:"AGENDA", audio:"AUDIOS/TRISILABS/AGENDA.mp3" },
+          { id:"PROFESSOR", symbol:"PROFESSOR", audio:"AUDIOS/TRISILABS/PROFESSOR.mp3" },
+          { id:"PISSARRA", symbol:"PISSARRA", audio:"AUDIOS/TRISILABS/PISSARRA.mp3" },
+          { id:"PILOTA", symbol:"PILOTA", audio:"AUDIOS/TRISILABS/PILOTA.mp3" },
+          { id:"SABATA", symbol:"SABATA", audio:"AUDIOS/TRISILABS/SABATA.mp3" },
+          { id:"GIRAFA", symbol:"GIRAFA", audio:"AUDIOS/TRISILABS/GIRAFA.mp3" },
+          { id:"GANIVET", symbol:"GANIVET", audio:"AUDIOS/TRISILABS/GANIVET.mp3" },
+          { id:"ESQUIROL", symbol:"ESQUIROL", audio:"AUDIOS/TRISILABS/ESQUIROL.mp3" },
+          { id:"TOMÀQUET", symbol:"TOMÀQUET", audio:"AUDIOS/TRISILABS/TOMAQUET.mp3" },
+          { id:"CASSOLA", symbol:"CASSOLA", audio:"AUDIOS/TRISILABS/CASSOLA.mp3" },
+          { id:"ELEFANT", symbol:"ELEFANT", audio:"AUDIOS/TRISILABS/ELEFANT.mp3" },
+          { id:"CIRERA", symbol:"CIRERA", audio:"AUDIOS/TRISILABS/CIRERA.mp3" },
+          { id:"CABANYA", symbol:"CABANYA", audio:"AUDIOS/TRISILABS/CAVANYA.mp3" },
+          { id:"FORQUILLA", symbol:"FORQUILLA", audio:"AUDIOS/TRISILABS/FORQUILLA.mp3" },
+          { id:"VACANCES", symbol:"VACANCES", audio:"AUDIOS/TRISILABS/VACANCES.mp3" },
+          { id:"PINTURA", symbol:"PINTURA", audio:"AUDIOS/TRISILABS/PINTURA.mp3" },
+          { id:"LECTURA", symbol:"LECTURA", audio:"AUDIOS/TRISILABS/LECTURA.mp3" },
+          { id:"BEGUDA", symbol:"BEGUDA", audio:"AUDIOS/TRISILABS/BEGUDA.mp3" },
+          { id:"FARINA", symbol:"FARINA", audio:"AUDIOS/TRISILABS/FARINA.mp3" },
+          { id:"GALETA", symbol:"GALETA", audio:"AUDIOS/TRISILABS/GALETA.mp3" },
+          { id:"ESCALA", symbol:"ESCALA", audio:"AUDIOS/TRISILABS/ESCALA.mp3" },
+          { id:"CADIRA", symbol:"CADIRA", audio:"AUDIOS/TRISILABS/CADIRA.mp3" },
+          { id:"TARONJA", symbol:"TARONJA", audio:"AUDIOS/TRISILABS/TARONJA.mp3" },
+          { id:"SOMRIURE", symbol:"SOMRIURE", audio:"AUDIOS/TRISILABS/SOMRIURE.mp3" },
+          { id:"GERMANA", symbol:"GERMANA", audio:"AUDIOS/TRISILABS/GERMANA.mp3" },
+          { id:"AUTOBÚS", symbol:"AUTOBÚS", audio:"AUDIOS/TRISILABS/AUTOBUS.mp3" },
+          { id:"SEMÀFOR", symbol:"SEMÀFOR", audio:"AUDIOS/TRISILABS/SEMAFOR.mp3" },
+          { id:"BALDUFA", symbol:"BALDUFA", audio:"AUDIOS/TRISILABS/BALDUFA.mp3" },
+          { id:"CINEMA", symbol:"CINEMA", audio:"AUDIOS/TRISILABS/CINMEA.mp3" },
+          { id:"CATORZE", symbol:"CATORZE", audio:"AUDIOS/TRISILABS/CATORZE.mp3" },
+          { id:"GUITARRA", symbol:"GUITARRA", audio:"AUDIOS/TRISILABS/GUITARRA.mp3" },
+          { id:"TRISTESA", symbol:"TRISTESA", audio:"AUDIOS/TRISILABS/TRISTESA.mp3" },
+          { id:"TEMPESTA", symbol:"TEMPESTA", audio:"AUDIOS/TRISILABS/TEMPESTA.mp3" },
+          { id:"PRINCESA", symbol:"PRINCESA", audio:"AUDIOS/TRISILABS/PRINCESA.mp3" },
+          { id:"MALETA", symbol:"MALETA", audio:"AUDIOS/TRISILABS/MALETA.mp3" },
+          { id:"CATALÀ", symbol:"CATALÀ", audio:"AUDIOS/TRISILABS/CATALA.mp3" },
+          { id:"NATURALS", symbol:"NATURALS", audio:"AUDIOS/TRISILABS/NATURALS.mp3" },
+          { id:"DIRECTOR", symbol:"DIRECTOR", audio:"AUDIOS/TRISILABS/DIRECTOR.mp3" },
+          { id:"LLENGUA", symbol:"LLENGUA", audio:"AUDIOS/TRISILABS/LLENGUA.mp3" },
+          { id:"GALLINA", symbol:"GALLINA", audio:"AUDIOS/TRISILABS/GALLINA.mp3" }
+        ]
+
+      },
+      9: {
+        title: "FASE 8",
+        help: "Escolta l’àudio i toca la paraula llarga correcta.",
+        actionTitle: "ESCOLTA I TRIA",
+        actionHelp: "",
+        items: [
+          { id:"HELICÒPTER_1", symbol:"HELICÒPTER", audio:"AUDIOS/LLARGUES/HELICOPTER.mp3" },
+          { id:"IMPRESSORA", symbol:"IMPRESSORA", audio:"AUDIOS/LLARGUES/IMPRESSORA.mp3" },
+          { id:"CREMALLERA", symbol:"CREMALLERA", audio:"AUDIOS/LLARGUES/CREMALLERA.mp3" },
+          { id:"INFERMERA", symbol:"INFERMERA", audio:"AUDIOS/LLARGUES/INFERMERA.mp3" },
+          { id:"DROMEDARI", symbol:"DROMEDARI", audio:"AUDIOS/LLARGUES/DROMEDARI.mp3" },
+          { id:"MATEMÀTIQUES", symbol:"MATEMÀTIQUES", audio:"AUDIOS/LLARGUES/MATEMATIQUES.mp3" },
+          { id:"AMBULÀNCIA", symbol:"AMBULÀNCIA", audio:"AUDIOS/LLARGUES/AMBULANCIA.mp3" },
+          { id:"FUTBOLISTA", symbol:"FUTBOLISTA", audio:"AUDIOS/LLARGUES/FUTBOLISTA.mp3" },
+          { id:"AMANIDA", symbol:"AMANIDA", audio:"AUDIOS/LLARGUES/AMANIDA.mp3" },
+          { id:"ASTRONAUTA", symbol:"ASTRONAUTA", audio:"AUDIOS/LLARGUES/ASTRONAUTA.mp3" },
+          { id:"AVELLANES", symbol:"AVELLANES", audio:"AUDIOS/LLARGUES/AVELLANES.mp3" },
+          { id:"SENYORETA", symbol:"SENYORETA", audio:"AUDIOS/LLARGUES/SENYORETA.mp3" },
+          { id:"ESPARDENYA", symbol:"ESPARDENYA", audio:"AUDIOS/LLARGUES/ESPARDENYA.mp3" },
+          { id:"BOTIFARRA", symbol:"BOTIFARRA", audio:"AUDIOS/LLARGUES/BOTIFARRA.mp3" },
+          { id:"TELEVISIÓ", symbol:"TELEVISIÓ", audio:"AUDIOS/LLARGUES/TELEVISIO.mp3" },
+          { id:"MELMELADA", symbol:"MELMELADA", audio:"AUDIOS/LLARGUES/MELMELADA.mp3" },
+          { id:"PAPERERA", symbol:"PAPERERA", audio:"AUDIOS/LLARGUES/PAPERERA.mp3" },
+          { id:"ORDINADOR", symbol:"ORDINADOR", audio:"AUDIOS/LLARGUES/ORDINADOR.mp3" },
+          { id:"HIPOPÒTAM", symbol:"HIPOPÒTAM", audio:"AUDIOS/LLARGUES/HIPOPOTAM.mp3" },
+          { id:"REGADORA", symbol:"REGADORA", audio:"AUDIOS/LLARGUES/REGADORA.mp3" },
+          { id:"SAMARRETA", symbol:"SAMARRETA", audio:"AUDIOS/LLARGUES/SAMARRETA.mp3" },
+          { id:"TERMÒMETRE", symbol:"TERMÒMETRE", audio:"AUDIOS/LLARGUES/TERMOMETRE.mp3" },
+          { id:"PISSARRA", symbol:"PISSARRA", audio:"AUDIOS/LLARGUES/PISSARRA.mp3" },
+          { id:"AGRADABLE", symbol:"AGRADABLE", audio:"AUDIOS/LLARGUES/AGRADABLE.mp3" },
+          { id:"MANDÍBULA", symbol:"MANDÍBULA", audio:"AUDIOS/LLARGUES/MANDIBULA.mp3" },
+          { id:"CARTELLERA", symbol:"CARTELLERA", audio:"AUDIOS/LLARGUES/CARTELLERA.mp3" },
+          { id:"CARREGADOR", symbol:"CARREGADOR", audio:"AUDIOS/LLARGUES/CARREGADOR.mp3" },
+          { id:"TELESCOPI", symbol:"TELESCOPI", audio:"AUDIOS/LLARGUES/TELESCOPI.mp3" },
+          { id:"RELAXACIÓ", symbol:"RELAXACIÓ", audio:"AUDIOS/LLARGUES/RELAXACIO.mp3" },
+          { id:"PAPALLONA", symbol:"PAPALLONA", audio:"AUDIOS/LLARGUES/PAPALLONA.mp3" },
+          { id:"HELICÒPTER_2", symbol:"HELICÒPTER", audio:"AUDIOS/LLARGUES/HELICOPTER-2.mp3" },
+          { id:"RESPIRACIÓ", symbol:"RESPIRACIÓ", audio:"AUDIOS/LLARGUES/RESPIRACIO.mp3" },
+          { id:"ESPANTAOCELLS", symbol:"ESPANTAOCELLS", audio:"AUDIOS/LLARGUES/ESPANTAOCELLS.mp3" },
+          { id:"ESPARADRAP", symbol:"ESPARADRAP", audio:"AUDIOS/LLARGUES/ESPARADRAP.mp3" },
+          { id:"MUSCULATURA", symbol:"MUSCULATURA", audio:"AUDIOS/LLARGUES/MUSCULATURA.mp3" },
+          { id:"GIMNÀSTICA", symbol:"GIMNÀSTICA", audio:"AUDIOS/LLARGUES/GIMNASTICA.mp3" },
+          { id:"ESPARDENYES", symbol:"ESPARDENYES", audio:"AUDIOS/LLARGUES/ESPARDENYES.mp3" },
+          { id:"ESCARABAT", symbol:"ESCARABAT", audio:"AUDIOS/LLARGUES/ESCARABAT.mp3" },
+          { id:"MARIETA", symbol:"MARIETA", audio:"AUDIOS/LLARGUES/MARIETA.mp3" },
+          { id:"CALCULADORA", symbol:"CALCULADORA", audio:"AUDIOS/LLARGUES/CALCULADORA.mp3" },
+          { id:"MONSTRUOSA", symbol:"MONSTRUOSA", audio:"AUDIOS/LLARGUES/MONSTRUOSA.mp3" },
+          { id:"MAQUINETA", symbol:"MAQUINETA", audio:"AUDIOS/LLARGUES/MAQUINETA.mp3" },
+          { id:"GRAPADORA", symbol:"GRAPADORA", audio:"AUDIOS/LLARGUES/GRAPADORA.mp3" },
+          { id:"ESCURADENTS", symbol:"ESCURADENTS", audio:"AUDIOS/LLARGUES/ESCURADENTS.mp3" },
+          { id:"JOIERIA", symbol:"JOIERIA", audio:"AUDIOS/LLARGUES/JOIERIA.mp3" },
+          { id:"INVESTIGACIÓ", symbol:"INVESTIGACIÓ", audio:"AUDIOS/LLARGUES/INVESTIGACIO.mp3" },
+          { id:"ESCRIPTURA", symbol:"ESCRIPTURA", audio:"AUDIOS/LLARGUES/ESCRIPTURA.mp3" },
+          { id:"EMPERADOR", symbol:"EMPERADOR", audio:"AUDIOS/LLARGUES/EMPERADOR.mp3" },
+          { id:"ARRACADA", symbol:"ARRACADA", audio:"AUDIOS/LLARGUES/ARRACADA.mp3" },
+          { id:"CABELLERA", symbol:"CABELLERA", audio:"AUDIOS/LLARGUES/CABELLERA.mp3" },
+          { id:"COSTURERA", symbol:"COSTURERA", audio:"AUDIOS/LLARGUES/COSTURERA.mp3" },
+          { id:"VELOCITAT", symbol:"VELOCITAT", audio:"AUDIOS/LLARGUES/VELOCITAT.mp3" },
+          { id:"CAMAMILLA", symbol:"CAMAMILLA", audio:"AUDIOS/LLARGUES/CAMAMILLA.mp3" },
+          { id:"DIFERÈNCIA", symbol:"DIFERÈNCIA", audio:"AUDIOS/LLARGUES/DIFERENCIA.mp3" },
+          { id:"CALEFACCIÓ", symbol:"CALEFACCIÓ", audio:"AUDIOS/LLARGUES/CALEFACCIO.mp3" },
+          { id:"MOBILITAT", symbol:"MOBILITAT", audio:"AUDIOS/LLARGUES/MOBILITAT.mp3" },
+          { id:"UNIFORME", symbol:"UNIFORME", audio:"AUDIOS/LLARGUES/UNIFORME.mp3" },
+          { id:"ARTICULACIÓ", symbol:"ARTICULACIÓ", audio:"AUDIOS/LLARGUES/ARTICULACIO.mp3" },
+          { id:"DESPERTADOR", symbol:"DESPERTADOR", audio:"AUDIOS/LLARGUES/DESPERTADOR.mp3" },
+          { id:"PINTALLAVIS", symbol:"PINTALLAVIS", audio:"AUDIOS/LLARGUES/PINTALLAVIS.mp3" }
+        ]
+      },
+      10: {
+        title: "FASE 9",
+        help: "Escolta l’àudio i toca la pseudoparaula correcta.",
+        actionTitle: "ESCOLTA I TRIA",
+        actionHelp: "",
+        items: [
+          { id:"SERGAMINYA", symbol:"SERGAMINYA", audio:"AUDIOS/PSEUDOPARAULES/SERGAMINYA.mp3" },
+          { id:"CROSTREPOC", symbol:"CROSTREPOC", audio:"AUDIOS/PSEUDOPARAULES/CROSTREPOC.mp3" },
+          { id:"GLOPISA", symbol:"GLOPISA", audio:"AUDIOS/PSEUDOPARAULES/GLOPISA.mp3" },
+          { id:"NEMICOTA", symbol:"NEMICOTA", audio:"AUDIOS/PSEUDOPARAULES/NEMICOTA.mp3" },
+          { id:"MIRANDETA", symbol:"MIRANDETA", audio:"AUDIOS/PSEUDOPARAULES/MIRANDETA.mp3" },
+          { id:"TROPICONS", symbol:"TROPICONS", audio:"AUDIOS/PSEUDOPARAULES/TROPICONS.mp3" },
+          { id:"MIFRESSAT", symbol:"MIFRESSAT", audio:"AUDIOS/PSEUDOPARAULES/MIFRESSAT.mp3" },
+          { id:"MINORETA", symbol:"MINORETA", audio:"AUDIOS/PSEUDOPARAULES/MINORETA.mp3" },
+          { id:"BABOTALIC", symbol:"BABOTALIC", audio:"AUDIOS/PSEUDOPARAULES/BABOTALIC.mp3" },
+          { id:"RERITROLI", symbol:"RERITROLI", audio:"AUDIOS/PSEUDOPARAULES/RERITROLI.mp3" },
+          { id:"MIRRATRILA", symbol:"MIRRATRILA", audio:"AUDIOS/PSEUDOPARAULES/MIRRATRILA.mp3" },
+          { id:"PORALITRA", symbol:"PORALITRA", audio:"AUDIOS/PSEUDOPARAULES/PORALITRA.mp3" },
+          { id:"COPALUSA", symbol:"COPALUSA", audio:"AUDIOS/PSEUDOPARAULES/COPALUSA.mp3" },
+          { id:"OTIMBALICA_1", symbol:"OTIMBALICA", audio:"AUDIOS/PSEUDOPARAULES/OTIMBALICA.mp3" },
+          { id:"QUETRUSCA", symbol:"QUETRUSCA", audio:"AUDIOS/PSEUDOPARAULES/QUETRUSCA.mp3" },
+          { id:"MAQUESTRIA_1", symbol:"MAQUESTRIA", audio:"AUDIOS/PSEUDOPARAULES/MAQUESTRIA.mp3" },
+          { id:"MAQUESTRIA_2", symbol:"MAQUESTRIA", audio:"AUDIOS/PSEUDOPARAULES/MAQUESTRIA-2.mp3" },
+          { id:"XAXONITA", symbol:"XAXONITA", audio:"AUDIOS/PSEUDOPARAULES/XAXONITA.mp3" },
+          { id:"MIMOCA", symbol:"MIMOCA", audio:"AUDIOS/PSEUDOPARAULES/MIMOCA.mp3" },
+          { id:"CALIDOTRIA", symbol:"CALIDOTRIA", audio:"AUDIOS/PSEUDOPARAULES/CALIDOTRIA.mp3" },
+          { id:"MAQUIOTRA", symbol:"MAQUIOTRA", audio:"AUDIOS/PSEUDOPARAULES/MAQUIOTRA.mp3" },
+          { id:"CLAVEMILLA", symbol:"CLAVEMILLA", audio:"AUDIOS/PSEUDOPARAULES/CLAVEMILLA.mp3" },
+          { id:"GIROCALIT", symbol:"GIROCALIT", audio:"AUDIOS/PSEUDOPARAULES/GIROCALIT.mp3" },
+          { id:"LLALLITROCALI", symbol:"LLALLITROCALI", audio:"AUDIOS/PSEUDOPARAULES/LLALLITROCALI.mp3" },
+          { id:"SERGENTONA", symbol:"SERGENTONA", audio:"AUDIOS/PSEUDOPARAULES/SERGENTONA.mp3" },
+          { id:"GIGAGOT", symbol:"GIGAGOT", audio:"AUDIOS/PSEUDOPARAULES/GIGAGOT.mp3" },
+          { id:"CORALICOSSI", symbol:"CORALICOSSI", audio:"AUDIOS/PSEUDOPARAULES/CORALICOSSI.mp3" },
+          { id:"PIROTET", symbol:"PIROTET", audio:"AUDIOS/PSEUDOPARAULES/PIROTET.mp3" },
+          { id:"FOCALIPOS", symbol:"FOCALIPOS", audio:"AUDIOS/PSEUDOPARAULES/FOCALIPOS.mp3" },
+          { id:"GOLAMETA", symbol:"GOLAMETA", audio:"AUDIOS/PSEUDOPARAULES/GOLAMETA.mp3" },
+          { id:"MIRAMBELLA", symbol:"MIRAMBELLA", audio:"AUDIOS/PSEUDOPARAULES/MIRAMBELLA.mp3" },
+          { id:"MOCRAMITA", symbol:"MOCRAMITA", audio:"AUDIOS/PSEUDOPARAULES/MOCRAMITA.mp3" },
+          { id:"COMICALI", symbol:"COMICALI", audio:"AUDIOS/PSEUDOPARAULES/COMICALI.mp3" },
+          { id:"SAMUNTINA", symbol:"SAMUNTINA", audio:"AUDIOS/PSEUDOPARAULES/SAMUNTINA.mp3" },
+          { id:"LISSAMINAT", symbol:"LISSAMINAT", audio:"AUDIOS/PSEUDOPARAULES/LISSAMINAT.mp3" },
+          { id:"MICROLICRE", symbol:"MICROLICRE", audio:"AUDIOS/PSEUDOPARAULES/MICROLICRE.mp3" },
+          { id:"POTULICAS", symbol:"POTULICAS", audio:"AUDIOS/PSEUDOPARAULES/POTULICAS.mp3" },
+          { id:"COMITALIA", symbol:"COMITALIA", audio:"AUDIOS/PSEUDOPARAULES/COMITALIA.mp3" },
+          { id:"TROTRICAT", symbol:"TROTRICAT", audio:"AUDIOS/PSEUDOPARAULES/TROTRICAT.mp3" },
+          { id:"MUNIDRESSI", symbol:"MUNIDRESSI", audio:"AUDIOS/PSEUDOPARAULES/MUNIDRESSI.mp3" },
+          { id:"MICOLUIS", symbol:"MICOLUIS", audio:"AUDIOS/PSEUDOPARAULES/MICOLUIS.mp3" },
+          { id:"CAFRISTAS", symbol:"CAFRISTAS", audio:"AUDIOS/PSEUDOPARAULES/CAFRISTAS.mp3" },
+          { id:"POTRILLERIA", symbol:"POTRILLERIA", audio:"AUDIOS/PSEUDOPARAULES/POTRILLERIA.mp3" },
+          { id:"CASETIVAS", symbol:"CASETIVAS", audio:"AUDIOS/PSEUDOPARAULES/CASETIVAS.mp3" },
+          { id:"CROSSIRA", symbol:"CROSSIRA", audio:"AUDIOS/PSEUDOPARAULES/CROSSIRA.mp3" },
+          { id:"BEATRIMAT", symbol:"BEATRIMAT", audio:"AUDIOS/PSEUDOPARAULES/BEATRIMAT.mp3" },
+          { id:"ZAMPRITOS", symbol:"ZAMPRITOS", audio:"AUDIOS/PSEUDOPARAULES/ZAMPRITOS.mp3" },
+          { id:"OTIMBALICA_2", symbol:"OTIMBALICA", audio:"AUDIOS/PSEUDOPARAULES/OTIMBALICA-2.mp3" },
+          { id:"MUDRISSONA", symbol:"MUDRISSONA", audio:"AUDIOS/PSEUDOPARAULES/MUDRISSONA.mp3" },
+          { id:"SACRELITRIES", symbol:"SACRELITRIES", audio:"AUDIOS/PSEUDOPARAULES/SACRELITRIES.mp3" },
+          { id:"RUQUERRA", symbol:"RUQUERRA", audio:"AUDIOS/PSEUDOPARAULES/RUQUERRA.mp3" },
+          { id:"CROMICRET", symbol:"CROMICRET", audio:"AUDIOS/PSEUDOPARAULES/CROMICRET.mp3" },
+          { id:"JULIMUNT", symbol:"JULIMUNT", audio:"AUDIOS/PSEUDOPARAULES/JULIMUNT.mp3" },
+          { id:"PORLOTURA", symbol:"PORLOTURA", audio:"AUDIOS/PSEUDOPARAULES/PORLOTURA.mp3" },
+          { id:"BRICRASAT", symbol:"BRICRASAT", audio:"AUDIOS/PSEUDOPARAULES/BRICRASAT.mp3" },
+          { id:"TRESTRIASSA", symbol:"TRESTRIASSA", audio:"AUDIOS/PSEUDOPARAULES/TRESTRIASSA.mp3" },
+          { id:"HORRITRAL", symbol:"HORRITRAL", audio:"AUDIOS/PSEUDOPARAULES/HORRITRAL.mp3" },
+          { id:"CROTRAMINA", symbol:"CROTRAMINA", audio:"AUDIOS/PSEUDOPARAULES/CROTRAMINA.mp3" },
+          { id:"CRATERINA", symbol:"CRATERINA", audio:"AUDIOS/PSEUDOPARAULES/CRATERINA.mp3" },
+          { id:"PUNTAMITA", symbol:"PUNTAMITA", audio:"AUDIOS/PSEUDOPARAULES/PUNTAMITA.mp3" }
+        ]
+      }
+
+
+    };
+
+    const state = {
+      player: "—",
+      level: 1,
+      mission: 0,
+      score: 0,
+      audio: true,
+      shadow: false,
+      playbackRate: 1,
+      masteredByLevel: Array.from({length:10}, () => []),
+      pendingReviewsByLevel: Array.from({length:10}, () => []),
+      levelHitsByLevel: Array(10).fill(0),
+      levelAttemptsByLevel: Array(10).fill(0),
+      currentTarget: null,
+      currentOptions: [],
+      locked: false
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const chipName = $("chipName");
+    const chipLevel = $("chipLevel");
+    const chipMission = $("chipMission");
+    const chipScore = $("chipScore");
+    const playerInput = $("playerInput");
+    const homeLevel = $("homeLevel");
+    const homeTip = $("homeTip");
+    const levelSelect = $("levelSelect");
+    const speedSelect = $("speedSelect");
+    const levelBar = $("levelBar");
+    const levelProgressText = $("levelProgressText");
+    const levelProgressTitle = $("levelProgressTitle");
+    const levelProgressNote = $("levelProgressNote");
+    const accuracyText = $("accuracyText");
+    const bigPrompt = $("bigPrompt");
+    const promptHelp = $("promptHelp");
+    const statusText = $("statusText");
+    const btnStart = $("btnStart");
+    const btnHow = $("btnHow");
+    const btnReset = $("btnReset");
+    const btnReplay = $("btnReplay");
+    const btnNext = $("btnNext");
+    const choicesArea = $("choicesArea");
+    const choiceButtons = [$("choice0"), $("choice1"), $("choice2"), $("choice3")];
+    const completionBox = $("completionBox");
+    const completionTitle = $("completionTitle");
+    const completionText = $("completionText");
+    const btnRepeatLevel = $("btnRepeatLevel");
+    const btnContinueLevel = $("btnContinueLevel");
+
+    let currentAudio = null;
+
+    function getLevelData(level){
+      return LEVEL_CONFIG[level] || null;
+    }
+
+    function getMasteredSet(level){
+      return new Set(state.masteredByLevel[level - 1] || []);
+    }
+
+    function saveState(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        player: state.player,
+        level: state.level,
+        mission: state.mission,
+        score: state.score,
+        audio: state.audio,
+        shadow: state.shadow,
+        playbackRate: state.playbackRate,
+        masteredByLevel: state.masteredByLevel,
+        pendingReviewsByLevel: state.pendingReviewsByLevel,
+        levelHitsByLevel: state.levelHitsByLevel,
+        levelAttemptsByLevel: state.levelAttemptsByLevel
+      }));
+    }
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return;
+        const saved = JSON.parse(raw);
+        state.player = typeof saved.player === "string" && saved.player.trim() ? saved.player : "—";
+        state.level = Number.isFinite(saved.level) ? Math.min(10, Math.max(1, saved.level)) : 1;
+        state.mission = Number.isFinite(saved.mission) ? Math.max(0, saved.mission) : 0;
+        state.score = Number.isFinite(saved.score) ? Math.max(0, saved.score) : 0;
+        state.audio = saved.audio !== false;
+        state.shadow = !!saved.shadow;
+        state.playbackRate = (saved.playbackRate === 0.75) ? 0.75 : 1;
+        if(Array.isArray(saved.masteredByLevel)){
+          state.masteredByLevel = Array.from({length:10}, (_, i) => Array.isArray(saved.masteredByLevel[i]) ? [...new Set(saved.masteredByLevel[i].filter(v => typeof v === 'string'))] : []);
+        }
+        if(Array.isArray(saved.pendingReviewsByLevel)){
+          state.pendingReviewsByLevel = Array.from({length:10}, (_, i) => Array.isArray(saved.pendingReviewsByLevel[i])
+            ? saved.pendingReviewsByLevel[i]
+                .filter(item => item && typeof item.symbol === 'string')
+                .map(item => ({ symbol:item.symbol, dueRound:Number.isFinite(item.dueRound) ? Math.max(1,item.dueRound) : 1 }))
+            : []);
+        }
+        if(Array.isArray(saved.levelHitsByLevel)){
+          state.levelHitsByLevel = Array.from({length:10}, (_, i) => Number.isFinite(saved.levelHitsByLevel[i]) ? Math.max(0, saved.levelHitsByLevel[i]) : 0);
+        }
+        if(Array.isArray(saved.levelAttemptsByLevel)){
+          state.levelAttemptsByLevel = Array.from({length:10}, (_, i) => Number.isFinite(saved.levelAttemptsByLevel[i]) ? Math.max(0, saved.levelAttemptsByLevel[i]) : 0);
+        }
+      }catch(e){ console.warn(e); }
+    }
+
+    function fillLevels(){
+      levelSelect.innerHTML = "";
+      LEVELS.forEach((name, idx) => {
+        const opt = document.createElement("option");
+        opt.value = String(idx + 1);
+        opt.textContent = name;
+        levelSelect.appendChild(opt);
+      });
+      levelSelect.value = String(state.level);
+    }
+
+    function updateProgress(){
+      const data = getLevelData(state.level);
+      levelProgressTitle.textContent = LEVELS[state.level - 1];
+      if(!data){
+        levelBar.style.width = "0%";
+        levelProgressText.textContent = "0 / 0 · 0%";
+        levelProgressNote.textContent = "Aquest nivell encara està pendent de carregar.";
+        accuracyText.textContent = "Percentatge d’encerts del nivell: 0%";
+        return;
+      }
+      const total = data.items.length;
+      const masteredCount = getMasteredSet(state.level).size;
+      const pct = total ? Math.round((masteredCount / total) * 100) : 0;
+      levelBar.style.width = `${pct}%`;
+      levelProgressText.textContent = `${masteredCount} / ${total} · ${pct}%`;
+      levelProgressNote.textContent = "Cal encertar almenys una vegada tots els elements del nivell.";
+      const attempts = state.levelAttemptsByLevel[state.level - 1] || 0;
+      const hits = state.levelHitsByLevel[state.level - 1] || 0;
+      const accPct = attempts ? Math.round((hits / attempts) * 100) : 0;
+      accuracyText.textContent = `Percentatge d’encerts del nivell: ${accPct}%`;
+    }
+
+    function updateButtons(){
+      document.body.classList.toggle("shadow-mode", state.shadow);
+    }
+
+    function updateHud(){
+      chipName.textContent = state.player;
+      chipLevel.textContent = state.level;
+      chipMission.textContent = state.mission;
+      chipScore.textContent = state.score;
+      homeLevel.textContent = state.level;
+      homeTip.textContent = TIPS[state.level - 1];
+      levelSelect.value = String(state.level);
+      speedSelect.value = String(state.playbackRate);
+      playerInput.value = state.player === "—" ? "" : state.player;
+      updateProgress();
+      updateButtons();
+    }
+
+    function shuffle(arr){
+      const copy = [...arr];
+      for(let i = copy.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function stopAudio(){
+      if(currentAudio){
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      }
+    }
+
+    function playAudioPath(path){
+      if(!state.audio || !path) return;
+      stopAudio();
+      currentAudio = new Audio(path);
+      currentAudio.playbackRate = state.playbackRate || 1;
+      currentAudio.play().catch(err => {
+        console.warn(err);
+        statusText.textContent = `Estat: no s'ha pogut reproduir ${path}`;
+      });
+    }
+
+    function playCurrentAudio(){
+      if(state.currentTarget) playAudioPath(state.currentTarget.audio);
+    }
+
+    function clearChoiceStyles(){
+      choiceButtons.forEach(btn => {
+        btn.classList.remove("correct", "wrong");
+        btn.disabled = false;
+      });
+    }
+
+    function hideCompletionBox(){
+      completionBox.classList.add("hidden");
+    }
+
+    
+    function showCompletionBox(){
+      const levelName = LEVELS[state.level - 1];
+
+      const attempts = state.levelAttemptsByLevel[state.level - 1] || 0;
+      const hits = state.levelHitsByLevel[state.level - 1] || 0;
+      const accPct = attempts ? Math.round((hits / attempts) * 100) : 0;
+
+      if(accPct < 80){
+        completionTitle.textContent = `Nivell completat: ${levelName}`;
+        completionText.textContent = `Encara estàs per sota del 80% d'encerts (${accPct}%). Prova de repetir el nivell per millorar la precisió.`;
+        btnContinueLevel.disabled = true;
+        btnContinueLevel.classList.add("hidden");
+      }
+      else if(state.level < LEVELS.length){
+        completionTitle.textContent = `Genial! Has completat ${levelName}`;
+        completionText.textContent = "Has arribat al 100% del nivell. Pots repetir-lo des de zero o continuar amb el següent nivell.";
+        btnContinueLevel.disabled = false;
+        btnContinueLevel.classList.remove("hidden");
+      }
+      else{
+        completionTitle.textContent = "HAS ACABAT TOTS ELS NIVELLS, FELICITATS!";
+        completionText.textContent = "Has completat l’última fase i ja has acabat tot el recorregut del joc.";
+        btnContinueLevel.disabled = true;
+        btnContinueLevel.classList.add("hidden");
+      }
+
+      completionBox.classList.remove("hidden");
+
+      choicesArea.classList.add("hidden");
+      btnReplay.disabled = true;
+      btnNext.disabled = true;
+    }
+
+    function updateStageForPlaceholder(){
+      choicesArea.classList.add("hidden");
+      hideCompletionBox();
+      btnReplay.disabled = true;
+      btnNext.disabled = true;
+      bigPrompt.textContent = "CONTINGUT PENDENT";
+      promptHelp.textContent = "Aquest nivell ja existeix al menú, però encara no té les paraules o síl·labes carregades.";
+      statusText.textContent = `Estat: nivell ${state.level} pendent de contingut`;
+    }
+
+    function scheduleReview(level, itemId){
+      if(!itemId) return;
+      const list = state.pendingReviewsByLevel[level - 1];
+      const existing = list.find(item => item.symbol === itemId);
+      const dueRound = state.mission + 3;
+      if(existing){
+        existing.dueRound = Math.min(existing.dueRound, dueRound);
+      } else {
+        list.push({ symbol:itemId, dueRound });
+      }
+    }
+
+    function pickNextTarget(level){
+      const data = getLevelData(level);
+      if(!data) return null;
+      const mastered = getMasteredSet(level);
+      const pendingList = state.pendingReviewsByLevel[level - 1];
+      const dueItems = pendingList.filter(item => item.dueRound <= state.mission + 1);
+      if(dueItems.length){
+        const selected = dueItems[Math.floor(Math.random() * dueItems.length)];
+        state.pendingReviewsByLevel[level - 1] = pendingList.filter(item => item !== selected);
+        return data.items.find(item => item.id === selected.symbol) || data.items[Math.floor(Math.random() * data.items.length)];
+      }
+      const unseen = data.items.filter(item => !mastered.has(item.id));
+      if(unseen.length) return unseen[Math.floor(Math.random() * unseen.length)];
+      return data.items[Math.floor(Math.random() * data.items.length)];
+    }
+
+    function renderRound(){
+      const data = getLevelData(state.level);
+      if(!data || !state.currentTarget) return;
+      hideCompletionBox();
+      bigPrompt.textContent = data.actionTitle;
+      promptHelp.textContent = data.actionHelp;
+      choicesArea.classList.remove("hidden");
+      btnReplay.disabled = false;
+      btnNext.disabled = false;
+      clearChoiceStyles();
+      choiceButtons.forEach((btn, index) => {
+        const item = state.currentOptions[index];
+        btn.textContent = item.symbol;
+        btn.dataset.itemId = item.id;
+        btn.onclick = () => handleChoice(item, btn);
+      });
+      playCurrentAudio();
+      statusText.textContent = `Estat: ronda ${state.mission} preparada`;
+    }
+
+    function nextRound(){
+      const data = getLevelData(state.level);
+      if(!data){
+        updateStageForPlaceholder();
+        return;
+      }
+      state.mission += 1;
+      const correct = pickNextTarget(state.level);
+      const distractors = shuffle(data.items.filter(item => item.id !== correct.id)).slice(0, 3);
+      state.currentTarget = correct;
+      state.currentOptions = shuffle([correct, ...distractors]);
+      state.locked = false;
+      updateHud();
+      saveState();
+      renderRound();
+    }
+
+    function markMastered(level, itemId){
+      const arr = state.masteredByLevel[level - 1];
+      if(!arr.includes(itemId)) arr.push(itemId);
+    }
+
+    function handleChoice(chosenItem, btn){
+      if(state.locked || !state.currentTarget) return;
+      if(chosenItem) playAudioPath(chosenItem.audio);
+
+      state.levelAttemptsByLevel[state.level - 1] += 1;
+      const isCorrect = chosenItem.id === state.currentTarget.id;
+      if(isCorrect){
+        state.locked = true;
+        btn.classList.add("correct");
+        choiceButtons.forEach(b => b.disabled = true);
+        state.score += 10;
+        state.levelHitsByLevel[state.level - 1] += 1;
+        markMastered(state.level, state.currentTarget.id);
+        updateHud();
+        saveState();
+        const data = getLevelData(state.level);
+        const total = data.items.length;
+        const masteredCount = getMasteredSet(state.level).size;
+        if(masteredCount >= total){
+          statusText.textContent = `Correcte: ${state.currentTarget.symbol}. Has completat el nivell al 100%.`;
+          setTimeout(showCompletionBox, 650);
+        } else {
+          statusText.textContent = `Correcte: ${state.currentTarget.symbol}. Passem a la següent ronda...`;
+          setTimeout(() => {
+            if(getLevelData(state.level)) nextRound();
+          }, 850);
+        }
+        return;
+      }
+
+      btn.classList.add("wrong");
+      btn.disabled = true;
+      scheduleReview(state.level, state.currentTarget.id);
+      statusText.textContent = `Incorrecte: has triat ${chosenItem.symbol}. Torna-ho a provar fins trobar la bona. Aquest element tornarà a sortir més endavant.`;
+      saveState();
+    }
+
+    function startLevel(){
+      hideCompletionBox();
+      stopAudio();
+      updateHud();
+      if(getLevelData(state.level)){
+        nextRound();
+      } else {
+        updateStageForPlaceholder();
+      }
+    }
+
+    btnStart.addEventListener("click", () => {
+      const name = playerInput.value.trim();
+      state.player = name ? name.slice(0,16) : "—";
+      saveState();
+      updateHud();
+      startLevel();
+    });
+
+    btnHow.addEventListener("click", () => {
+      alert(
+        "COM ES JUGA\n\n" +
+        "1. Escriu el nom de l’alumne.\n" +
+        "2. Tria un dels 10 nivells del menú.\n" +
+        "3. Prem COMENÇA.\n\n" +
+        "Si falles, la casella quedarà en vermell i hauràs de seguir provant fins encertar-la.\n" +
+        "A més, l’element fallat es guarda perquè torni a sortir més endavant.\n\n" +
+        "El progrés del nivell només arriba al 100% quan s’ha encertat almenys una vegada cada lletra, síl·laba o paraula del nivell."
+      );
+    });
+btnReset.addEventListener("click", () => {
+      stopAudio();
+      state.mission = 0;
+      state.score = 0;
+      state.masteredByLevel = Array.from({length:10}, () => []);
+      state.pendingReviewsByLevel = Array.from({length:10}, () => []);
+      state.levelHitsByLevel = Array(10).fill(0);
+      state.levelAttemptsByLevel = Array(10).fill(0);
+      state.currentTarget = null;
+      state.currentOptions = [];
+      state.locked = false;
+      bigPrompt.textContent = "—";
+      promptHelp.textContent = "Quan comencis, escoltaràs un àudio i n’hauràs de tocar l’opció correcta.";
+      choicesArea.classList.add("hidden");
+      hideCompletionBox();
+      btnReplay.disabled = true;
+      btnNext.disabled = true;
+      statusText.textContent = "Estat: progrés reiniciat";
+      saveState();
+      updateHud();
+    });
+
+    btnReplay.addEventListener("click", playCurrentAudio);
+    btnNext.addEventListener("click", () => {
+      if(getLevelData(state.level)) nextRound();
+    });
+
+    btnRepeatLevel.addEventListener("click", () => {
+      stopAudio();
+      state.mission = 0;
+      state.currentTarget = null;
+      state.currentOptions = [];
+      state.locked = false;
+      state.masteredByLevel[state.level - 1] = [];
+      state.pendingReviewsByLevel[state.level - 1] = [];
+      state.levelHitsByLevel[state.level - 1] = 0;
+      state.levelAttemptsByLevel[state.level - 1] = 0;
+      hideCompletionBox();
+      saveState();
+      updateHud();
+      startLevel();
+    });
+
+    btnContinueLevel.addEventListener("click", () => {
+      if(state.level >= LEVELS.length) return;
+      stopAudio();
+      state.level += 1;
+      state.mission = 0;
+      state.levelHitsByLevel[state.level - 1] = 0;
+      state.levelAttemptsByLevel[state.level - 1] = 0;
+      state.currentTarget = null;
+      state.currentOptions = [];
+      state.locked = false;
+      hideCompletionBox();
+      saveState();
+      updateHud();
+      startLevel();
+    });
+
+    levelSelect.addEventListener("change", () => {
+      const v = parseInt(levelSelect.value, 10);
+      if(!Number.isFinite(v)) return;
+      state.level = Math.min(10, Math.max(1, v));
+      state.mission = 0;
+      state.levelHitsByLevel[state.level - 1] = 0;
+      state.levelAttemptsByLevel[state.level - 1] = 0;
+      state.currentTarget = null;
+      state.currentOptions = [];
+      state.locked = false;
+      stopAudio();
+      hideCompletionBox();
+      saveState();
+      updateHud();
+      const data = getLevelData(state.level);
+      if(data){
+        bigPrompt.textContent = data.title;
+        promptHelp.textContent = data.help;
+      } else {
+        bigPrompt.textContent = "—";
+        promptHelp.textContent = "Aquí apareixerà el contingut del nivell quan el carreguem.";
+      }
+      choicesArea.classList.add("hidden");
+      btnReplay.disabled = true;
+      btnNext.disabled = true;
+      statusText.textContent = `Estat: nivell ${state.level} seleccionat`;
+    });
+
+    speedSelect.addEventListener("change", () => {
+      const val = Number(speedSelect.value);
+      state.playbackRate = (val === 0.75) ? 0.75 : 1;
+      saveState();
+      if(currentAudio){
+        currentAudio.playbackRate = state.playbackRate;
+      }
+    });
+
+    loadState();
+    fillLevels();
+    updateHud();
+    const initialData = getLevelData(state.level);
+    if(initialData){
+      bigPrompt.textContent = initialData.title;
+      promptHelp.textContent = initialData.help;
+      statusText.textContent = `Estat: base carregada. ${LEVELS[state.level - 1]} llest.`;
+    } else {
+      updateStageForPlaceholder();
+    }
+  </script>
+</body>
+</html>
