@@ -75,55 +75,84 @@
     }
 
 
-    /* ===== AJUSTOS MÒBIL / TABLET ===== */
+    .mobile-topbar{display:none}
+
     @media (max-width: 900px){
-      .wrap{padding:12px}
-      main{grid-template-columns:1fr}
-      .left{border-right:none;border-bottom:1px solid var(--line)}
-      header{padding:16px 14px;align-items:flex-start;flex-direction:column}
-      .hud{justify-content:flex-start}
-      .brand h1{font-size:20px}
-      .brand p{font-size:12px}
-      .shell{border-radius:20px}
-      .panel,.bigstage{border-radius:20px}
-      .stagebox,.card{padding:14px}
-      .choice{
-        font-size:28px;
-        min-height:110px;
-        padding:16px 12px;
-        line-height:1.08;
+      .wrap{padding:0}
+      .shell{border-radius:0;border-left:none;border-right:none;min-height:100vh}
+      header{padding:14px 12px;align-items:flex-start;flex-direction:column}
+      .brand p{display:none}
+      .hud{display:none}
+      main{display:block}
+      .left,.right{padding:12px}
+      .left{border-right:none;border-bottom:none}
+      .panel{padding:12px}
+      .card{padding:12px}
+      h2{display:none}
+
+      body.mobile-home .right{display:none}
+      body.mobile-home .left{display:block}
+      body.mobile-home #btnHow,
+      body.mobile-home .toast,
+      body.mobile-home .kv,
+      body.mobile-home #speedSelect,
+      body.mobile-home .label + #speedSelect,
+      body.mobile-home #btnReset{
+        display:none !important;
+      }
+      body.mobile-home .card > .kv,
+      body.mobile-home .card > .toast{
+        display:none !important;
+      }
+      body.mobile-home #btnStart{width:100%}
+      body.mobile-home #levelSelect,
+      body.mobile-home #playerInput{font-size:16px}
+
+      body.mobile-playing header{display:none}
+      body.mobile-playing .left{display:none}
+      body.mobile-playing .right{display:block;padding:8px}
+      body.mobile-playing .bigstage{
+        padding:10px;
+        gap:10px;
+        border-radius:0;
+        border:none;
+        background:transparent;
+      }
+      body.mobile-playing .stagebox{padding:12px}
+      body.mobile-playing .mobile-topbar{display:flex;margin-bottom:6px}
+      body.mobile-playing #btnBackMobile{
+        min-height:40px;
+        padding:8px 12px;
+        font-size:14px;
+      }
+      body.mobile-playing #bigPrompt,
+      body.mobile-playing #promptHelp{
+        display:none;
+      }
+      body.mobile-playing .btnrow{display:flex;gap:8px;margin-top:0 !important}
+      body.mobile-playing #btnReplay{width:100%}
+      body.mobile-playing .choices{
+        display:grid;
+        grid-template-columns:1fr;
+        gap:10px;
+        margin-top:10px;
+      }
+      body.mobile-playing .choice{
+        min-height:84px;
+        padding:12px 10px;
+        font-size:20px;
+        line-height:1.04;
+        letter-spacing:.01em;
+        white-space:normal;
         word-break:break-word;
         overflow-wrap:anywhere;
-        white-space:normal;
-        text-align:center;
       }
-    }
-
-    @media (max-width: 600px){
-      .wrap{padding:8px}
-      .left,.right{padding:10px}
-      .hud{gap:6px}
-      .chip{padding:8px 10px;font-size:12px}
-      .brand h1{font-size:18px}
-      .brand p{font-size:11px}
-      .choices{grid-template-columns:1fr;gap:10px}
-      .choice{
-        font-size:22px;
-        min-height:96px;
-        padding:14px 10px;
-        line-height:1.06;
-        letter-spacing:.02em;
-      }
-      .bigtext{font-size:28px}
-      .subtext{font-size:14px}
-      button,select,input{min-height:46px;padding:11px 12px}
-    }
-
-    @media (max-width: 420px){
-      .choice{
-        font-size:20px;
-        min-height:88px;
-        padding:12px 8px;
+      body.mobile-playing .footerbar{font-size:12px}
+      body.mobile-playing .progress-main{font-size:18px}
+      body.mobile-playing .progress-note{font-size:12px}
+      body.mobile-playing .completion-box .btnrow{
+        display:grid;
+        grid-template-columns:1fr;
       }
     }
 
@@ -212,6 +241,9 @@
             </div>
 
             <div class="stagebox">
+              <div class="mobile-topbar">
+                <button id="btnBackMobile" class="ghost">← Tornar</button>
+              </div>
               <div class="stage-title">ACTIVITAT</div>
               <div class="bigtext" id="bigPrompt">—</div>
               <div class="subtext" id="promptHelp">Quan comencis, escoltaràs un àudio i n’hauràs de tocar l’opció correcta.</div>
@@ -837,8 +869,24 @@
     const completionText = $("completionText");
     const btnRepeatLevel = $("btnRepeatLevel");
     const btnContinueLevel = $("btnContinueLevel");
+    const btnBackMobile = $("btnBackMobile");
 
     let currentAudio = null;
+
+    function isMobileLayout(){
+      return window.innerWidth <= 900;
+    }
+
+    function syncMobileScreen(home = null){
+      if(!isMobileLayout()){
+        document.body.classList.remove("mobile-home", "mobile-playing");
+        return;
+      }
+      const goHome = home === null ? !state.currentTarget : home;
+      document.body.classList.toggle("mobile-home", goHome);
+      document.body.classList.toggle("mobile-playing", !goHome);
+    }
+
 
     function getLevelData(level){
       return LEVEL_CONFIG[level] || null;
@@ -1142,6 +1190,7 @@
     function startLevel(){
       hideCompletionBox();
       stopAudio();
+      syncMobileScreen(false);
       updateHud();
       if(getLevelData(state.level)){
         nextRound();
@@ -1186,6 +1235,7 @@ btnReset.addEventListener("click", () => {
       hideCompletionBox();
       btnReplay.disabled = true;
       btnNext.disabled = true;
+      syncMobileScreen(true);
       statusText.textContent = "Estat: progrés reiniciat";
       saveState();
       updateHud();
@@ -1253,6 +1303,7 @@ btnReset.addEventListener("click", () => {
       choicesArea.classList.add("hidden");
       btnReplay.disabled = true;
       btnNext.disabled = true;
+      syncMobileScreen(true);
       statusText.textContent = `Estat: nivell ${state.level} seleccionat`;
     });
 
@@ -1265,8 +1316,35 @@ btnReset.addEventListener("click", () => {
       }
     });
 
+
+    btnBackMobile.addEventListener("click", () => {
+      stopAudio();
+      hideCompletionBox();
+      state.currentTarget = null;
+      state.currentOptions = [];
+      state.locked = false;
+      choicesArea.classList.add("hidden");
+      btnReplay.disabled = true;
+      btnNext.disabled = true;
+      const data = getLevelData(state.level);
+      if(data){
+        bigPrompt.textContent = data.title;
+        promptHelp.textContent = data.help;
+      } else {
+        bigPrompt.textContent = "—";
+        promptHelp.textContent = "Quan comencis, escoltaràs un àudio i n’hauràs de tocar l’opció correcta.";
+      }
+      syncMobileScreen(true);
+      statusText.textContent = "Estat: pantalla principal";
+    });
+
+    window.addEventListener("resize", () => {
+      syncMobileScreen(isMobileLayout() ? !state.currentTarget : null);
+    });
+
     loadState();
     fillLevels();
+    syncMobileScreen(true);
     updateHud();
     const initialData = getLevelData(state.level);
     if(initialData){
@@ -1277,53 +1355,5 @@ btnReset.addEventListener("click", () => {
       updateStageForPlaceholder();
     }
   </script>
-
-  <div id="rotateWarning" style="
-    position:fixed;
-    inset:0;
-    background:rgba(2,6,23,0.96);
-    color:#eaf3ff;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    z-index:9999;
-    padding:32px;
-    font-family:'Courier New', Courier, monospace;
-  ">
-    <div style="max-width:420px;line-height:1.5">
-      <div style="font-size:24px;font-weight:700;margin-bottom:16px">Gira el dispositiu</div>
-      <div style="font-size:18px;color:#cbd8f0">Per jugar millor, posa el mòbil en horitzontal.</div>
-    </div>
-  </div>
-
-  <script>
-    function checkLectoOrientation(){
-      const warning = document.getElementById('rotateWarning');
-      const isMobileLike = window.innerWidth < 900;
-      const isPortrait = window.innerHeight > window.innerWidth;
-      if(warning){
-        warning.style.display = (isMobileLike && isPortrait) ? 'flex' : 'none';
-      }
-    }
-
-    async function tryLandscapeLock(){
-      try{
-        if (window.innerWidth < 900 && screen.orientation && screen.orientation.lock) {
-          await screen.orientation.lock('landscape');
-        }
-      }catch(e){
-        // many browsers block this; ignore silently
-      }
-    }
-
-    window.addEventListener('resize', checkLectoOrientation);
-    window.addEventListener('orientationchange', checkLectoOrientation);
-    window.addEventListener('load', () => {
-      checkLectoOrientation();
-      tryLandscapeLock();
-    });
-  </script>
-
 </body>
 </html>
