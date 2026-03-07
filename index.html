@@ -74,6 +74,59 @@
         0 0 10px rgba(255,120,120,0.10);
     }
 
+
+    /* ===== AJUSTOS MÒBIL / TABLET ===== */
+    @media (max-width: 900px){
+      .wrap{padding:12px}
+      main{grid-template-columns:1fr}
+      .left{border-right:none;border-bottom:1px solid var(--line)}
+      header{padding:16px 14px;align-items:flex-start;flex-direction:column}
+      .hud{justify-content:flex-start}
+      .brand h1{font-size:20px}
+      .brand p{font-size:12px}
+      .shell{border-radius:20px}
+      .panel,.bigstage{border-radius:20px}
+      .stagebox,.card{padding:14px}
+      .choice{
+        font-size:28px;
+        min-height:110px;
+        padding:16px 12px;
+        line-height:1.08;
+        word-break:break-word;
+        overflow-wrap:anywhere;
+        white-space:normal;
+        text-align:center;
+      }
+    }
+
+    @media (max-width: 600px){
+      .wrap{padding:8px}
+      .left,.right{padding:10px}
+      .hud{gap:6px}
+      .chip{padding:8px 10px;font-size:12px}
+      .brand h1{font-size:18px}
+      .brand p{font-size:11px}
+      .choices{grid-template-columns:1fr;gap:10px}
+      .choice{
+        font-size:22px;
+        min-height:96px;
+        padding:14px 10px;
+        line-height:1.06;
+        letter-spacing:.02em;
+      }
+      .bigtext{font-size:28px}
+      .subtext{font-size:14px}
+      button,select,input{min-height:46px;padding:11px 12px}
+    }
+
+    @media (max-width: 420px){
+      .choice{
+        font-size:20px;
+        min-height:88px;
+        padding:12px 8px;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -1224,5 +1277,53 @@ btnReset.addEventListener("click", () => {
       updateStageForPlaceholder();
     }
   </script>
+
+  <div id="rotateWarning" style="
+    position:fixed;
+    inset:0;
+    background:rgba(2,6,23,0.96);
+    color:#eaf3ff;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    z-index:9999;
+    padding:32px;
+    font-family:'Courier New', Courier, monospace;
+  ">
+    <div style="max-width:420px;line-height:1.5">
+      <div style="font-size:24px;font-weight:700;margin-bottom:16px">Gira el dispositiu</div>
+      <div style="font-size:18px;color:#cbd8f0">Per jugar millor, posa el mòbil en horitzontal.</div>
+    </div>
+  </div>
+
+  <script>
+    function checkLectoOrientation(){
+      const warning = document.getElementById('rotateWarning');
+      const isMobileLike = window.innerWidth < 900;
+      const isPortrait = window.innerHeight > window.innerWidth;
+      if(warning){
+        warning.style.display = (isMobileLike && isPortrait) ? 'flex' : 'none';
+      }
+    }
+
+    async function tryLandscapeLock(){
+      try{
+        if (window.innerWidth < 900 && screen.orientation && screen.orientation.lock) {
+          await screen.orientation.lock('landscape');
+        }
+      }catch(e){
+        // many browsers block this; ignore silently
+      }
+    }
+
+    window.addEventListener('resize', checkLectoOrientation);
+    window.addEventListener('orientationchange', checkLectoOrientation);
+    window.addEventListener('load', () => {
+      checkLectoOrientation();
+      tryLandscapeLock();
+    });
+  </script>
+
 </body>
 </html>
